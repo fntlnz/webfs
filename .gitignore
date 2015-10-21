@@ -1,0 +1,11 @@
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+vendor/
+Testing/
+CTestTestfile.cmake
+bin/
+lib/
