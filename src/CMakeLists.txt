@@ -1,9 +1,12 @@
 find_package(FUSE REQUIRED)
 find_package(CURL REQUIRED)
-include_directories(${COMMON_INCLUDES} ${FUSE_INCLUDE_DIR} ${CURL_INCLUDE_DIRS})
 
-set(SOURCE_FILES fuse.c)
-add_library(libwebfs STATIC ${SOURCE_FILES})
+set(JSONCPP_INCLUDES ${PROJECT_SOURCE_DIR}/vendor/jsoncpp)
+set(JSONCPP_FILES ${PROJECT_SOURCE_DIR}/vendor/jsoncpp/jsoncpp.cpp)
+include_directories(${COMMON_INCLUDES} ${FUSE_INCLUDE_DIR} ${CURL_INCLUDE_DIRS} ${JSONCPP_INCLUDES})
+
+set(SOURCE_FILES fuse.cpp storage/adapter/gist.cpp)
+add_library(libwebfs STATIC ${SOURCE_FILES} ${JSONCPP_FILES})
 
 target_link_libraries(libwebfs ${FUSE_LIBRARIES} ${CURL_LIBRARIES})
 

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "fuse.c"
+#include "fuse.cpp"
 
 using namespace std;
 
