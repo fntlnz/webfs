@@ -3,12 +3,12 @@
 #define WEBFS_ADAPTER_H
 
 namespace Storage {
-    namespace Adapter {
-        class Adapter {
-        public:
-
-        };
-    }
+namespace Adapter {
+class Adapter {
+ public:
+  virtual Result write() = 0;
+};
+}
 }
 
 
