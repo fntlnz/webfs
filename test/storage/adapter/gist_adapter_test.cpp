@@ -6,7 +6,7 @@ class GistAdapterTest: public ::testing::Test {
   GistAdapterTest() {
 
   }
-  virtual ~GistAdapterTest()() {
+  virtual ~GistAdapterTest() {
 
   }
   virtual void SetUp() {

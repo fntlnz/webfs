@@ -1,8 +1,7 @@
 find_package(FUSE REQUIRED)
 find_package(CURL REQUIRED)
+include(DownloadJsonCpp)
 
-set(JSONCPP_INCLUDES ${PROJECT_SOURCE_DIR}/vendor/jsoncpp)
-set(JSONCPP_FILES ${PROJECT_SOURCE_DIR}/vendor/jsoncpp/jsoncpp.cpp)
 include_directories(${COMMON_INCLUDES} ${FUSE_INCLUDE_DIR} ${CURL_INCLUDE_DIRS} ${JSONCPP_INCLUDES})
 
 set(SOURCE_FILES fuse.cpp storage/adapter/gist.cpp)
