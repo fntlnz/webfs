@@ -16,9 +16,6 @@
 
 #include <string.h>
 
-#include "storage/adapter/gist.h"
-
-
 static int xmp_getattr(const char *path, struct stat *stbuf) {
   int res;
   res = lstat(path, stbuf);
@@ -169,8 +166,6 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 
 static int xmp_write(const char *path, const char *buf, size_t size,
                      off_t offset, struct fuse_file_info *fi) {
-  Storage::Adapter::Gist *gist = new Storage::Adapter::Gist();
-  gist->write();
   return 0;
 }
 

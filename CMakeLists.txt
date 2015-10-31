@@ -8,16 +8,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11  -D_FILE_OFFSET_BITS=64")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c11  -D_FILE_OFFSET_BITS=64")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_FILE_OFFSET_BITS=64")
 
 set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 
-
-enable_testing()
-
 add_subdirectory(src)
-add_subdirectory(test)
 
 add_custom_target(vcs-clean
         COMMAND find . -name "CMakeFiles" | xargs rm -rfv

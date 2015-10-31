@@ -4,9 +4,20 @@ Web backed filesystem
 
 ## Development
 
+Clone project including submodules
 ```
-cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=gcc-5 -DCMAKE_CXX_COMPILER=g++-5
+git clone --recursive git://github.com/fntlnz/webfs.git
+cd webfs
+```
+
+Compile a debug enabled binary
+```
+cmake -DCMAKE_BUILD_TYPE=Debug .
 make -j
+```
+
+Use it
+```
 ./bin/webfs -d -s -f
 ```
 

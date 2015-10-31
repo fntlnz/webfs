@@ -24,7 +24,6 @@ FIND_LIBRARY(CURL_LIBRARY NAMES curl libcurl_imp PATHS
         "$ENV{LIB_DIR}/lib"
         /usr/local/lib
         /usr/lib
-        c:/msys/local/lib
         NO_DEFAULT_PATH
         )
 

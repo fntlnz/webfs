@@ -1,7 +1,4 @@
-#include <iostream>
-#include "fuse.cpp"
-
-using namespace std;
+#include "fuse.c"
 
 int main(int argc, char *argv[]) {
   umask(0);
