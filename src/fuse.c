@@ -1,195 +1,105 @@
-#define FUSE_USE_VERSION 30
+#define FUSE_USE_VERSION 26
 
 #include <fuse.h>
-
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <dirent.h>
 #include <errno.h>
-#include <sys/time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/xattr.h>
+#include <fcntl.h>
 
-#include <string.h>
+#include "storage/gist.h"
 
-static int xmp_getattr(const char *path, struct stat *stbuf) {
-  int res;
-  res = lstat(path, stbuf);
-  if (res == -1)
-    return -errno;
-  return 0;
-}
+static const char *dummy_file_content = "I'm an example file used until we implement a mapping for storage\n";
+static const char *dummy_file_path = "/dummy";
 
-static int xmp_access(const char *path, int mask) {
-  int res;
-  res = access(path, mask);
-  if (res == -1)
-    return -errno;
-  return 0;
-}
+static int getattr_callback(const char *path, struct stat *stbuf)
+{
+  int res = 0;
 
-static int xmp_readlink(const char *path, char *buf, size_t size) {
-  int res;
-  res = readlink(path, buf, size - 1);
-  if (res == -1)
-    return -errno;
-  buf[res] = '\0';
-  return 0;
-}
-
-static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-                       off_t offset, struct fuse_file_info *fi) {
-  DIR *dp;
-  struct dirent *de;
-  (void) offset;
-  (void) fi;
-  dp = opendir(path);
-  if (dp == NULL)
-    return -errno;
-  while ((de = readdir(dp)) != NULL) {
-    struct stat st;
-    memset(&st, 0, sizeof(st));
-    st.st_ino = de->d_ino;
-    st.st_mode = de->d_type << 12;
-    if (filler(buf, de->d_name, &st, 0))
-      break;
+  memset(stbuf, 0, sizeof(struct stat));
+  if (strcmp(path, "/") == 0) {
+    stbuf->st_mode = S_IFDIR | 0755;
+    stbuf->st_nlink = 2;
+  } else if (strcmp(path, dummy_file_path) == 0) {
+    stbuf->st_mode = S_IFREG | 0777;
+    stbuf->st_nlink = 1;
+    stbuf->st_size = strlen(dummy_file_content);
+  } else {
+    res = -ENOENT;
   }
-  closedir(dp);
-  return 0;
-}
-static int xmp_mknod(const char *path, mode_t mode, dev_t rdev) {
-  int res;
-  /* On Linux this could just be 'mknod(path, mode, rdev)' but this
-     is more portable */
-  if (S_ISREG(mode)) {
-    res = open(path, O_CREAT | O_EXCL | O_WRONLY, mode);
-    if (res >= 0)
-      res = close(res);
-  } else if (S_ISFIFO(mode))
-    res = mkfifo(path, mode);
-  else
-    res = mknod(path, mode, rdev);
-  if (res == -1)
-    return -errno;
-  return 0;
-}
-static int xmp_mkdir(const char *path, mode_t mode) {
-  int res;
-  res = mkdir(path, mode);
-  if (res == -1)
-    return -errno;
-  return 0;
-}
-static int xmp_unlink(const char *path) {
-  int res;
-  res = unlink(path);
-  if (res == -1)
-    return -errno;
-  return 0;
-}
-static int xmp_rmdir(const char *path) {
-  //    int res;
-  //    res = rmdir(path);
-  //    if (res == -1)
-  //        return -errno;
-  return 0;
-}
-static int xmp_symlink(const char *from, const char *to) {
-  int res;
-  res = symlink(from, to);
-  if (res == -1)
-    return -errno;
-  return 0;
-}
-static int xmp_rename(const char *from, const char *to) {
-  int res;
-  res = rename(from, to);
-  if (res == -1)
-    return -errno;
-  return 0;
-}
-static int xmp_link(const char *from, const char *to) {
-  int res;
-  res = link(from, to);
-  if (res == -1)
-    return -errno;
-  return 0;
-}
-static int xmp_chmod(const char *path, mode_t mode) {
-  int res;
-  res = chmod(path, mode);
-  if (res == -1)
-    return -errno;
-  return 0;
-}
-static int xmp_chown(const char *path, uid_t uid, gid_t gid) {
-  int res;
-  res = lchown(path, uid, gid);
-  if (res == -1)
-    return -errno;
-  return 0;
-}
-static int xmp_truncate(const char *path, off_t size) {
-  int res;
-  res = truncate(path, size);
-  if (res == -1)
-    return -errno;
-  return 0;
-}
 
-static int xmp_open(const char *path, struct fuse_file_info *fi) {
-  int res;
-  res = open(path, fi->flags);
-  if (res == -1)
-    return -errno;
-  close(res);
-  return 0;
-}
-static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
-                    struct fuse_file_info *fi) {
-  int fd;
-  int res;
-  (void) fi;
-  fd = open(path, O_RDONLY);
-  if (fd == -1)
-    return -errno;
-  res = pread(fd, buf, size, offset);
-  if (res == -1)
-    res = -errno;
-  close(fd);
   return res;
 }
 
-static int xmp_write(const char *path, const char *buf, size_t size,
-                     off_t offset, struct fuse_file_info *fi) {
+static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
+    off_t offset, struct fuse_file_info *fi)
+{
+  (void) offset;
+  (void) fi;
+
+  if (strcmp(path, "/") != 0) {
+    return -ENOENT;
+  }
+
+  filler(buf, ".", NULL, 0);
+  filler(buf, "..", NULL, 0);
+  filler(buf, dummy_file_path + 1, NULL, 0);
+
   return 0;
 }
 
-static int xmp_statfs(const char *path, struct statvfs *stbuf) {
-  int res;
-  res = statvfs(path, stbuf);
-  if (res == -1)
-    return -errno;
+static int open_callback(const char *path, struct fuse_file_info *fi)
+{
+  if (strcmp(path, dummy_file_path) != 0) {
+    return -ENOENT;
+  }
+
+  /*if ((fi->flags & 3) != O_RDONLY) {*/
+    /*return -EACCES;*/
+  /*}*/
+
   return 0;
 }
-static int xmp_release(const char *path, struct fuse_file_info *fi) {
-  /* Just a stub.  This method is optional and can safely be left
-     unimplemented */
-  (void) path;
+
+static int read_callback(const char *path, char *buf, size_t size, off_t offset,
+    struct fuse_file_info *fi)
+{
+  size_t len;
   (void) fi;
+  if(strcmp(path, dummy_file_path) != 0) {
+    return -ENOENT;
+  }
+
+  len = strlen(dummy_file_content);
+
+  if (offset < len) {
+    if (offset + size > len) {
+      size = len - offset;
+    }
+    memcpy(buf, dummy_file_content + offset, size);
+  } else {
+    size = 0;
+  }
+
+  return size;
+}
+
+static int write_callback(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
+{
+  char *result = storage_write(buf);
+  return size;
+}
+
+static int truncate_callback(const char *path, off_t offset)
+{
   return 0;
 }
-static int xmp_fsync(const char *path, int isdatasync,
-                     struct fuse_file_info *fi) {
-  /* Just a stub.  This method is optional and can safely be left
-     unimplemented */
-  (void) path;
-  (void) isdatasync;
-  (void) fi;
-  return 0;
-}
+
+static struct fuse_operations webfs_fuse_ops = {
+  .getattr    = getattr_callback,
+  .readdir    = readdir_callback,
+  .open       = open_callback,
+  .read       = read_callback,
+  .write      = write_callback,
+  .truncate   = truncate_callback,
+};
 
