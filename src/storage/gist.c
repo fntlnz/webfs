@@ -51,7 +51,7 @@ char *storage_write(const char *buf)
 
   char *encoded_output;
   base64_encode(buf, strlen(buf), &encoded_output);
-  char *template = "{\"description\": \"the description for this gist\", \"public\": true, \"files\": { \"file1.txt\": { \"content\": \"%s\"}}}";
+  char *template = "{\"description\": \"\", \"public\": false, \"files\": { \"webfs.txt\": { \"content\": \"%s\"}}}";
   size_t total_length = strlen(template) + strlen(encoded_output);
   char *req_json = malloc(sizeof(char) * total_length);
   sprintf(req_json, template, encoded_output);
