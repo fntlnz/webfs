@@ -17,6 +17,7 @@ struct node {
   struct node *parent;
   struct node **children;
   size_t num_children;
+  size_t size;
   char *name;
   enum node_type type;
   node_location_t **location;

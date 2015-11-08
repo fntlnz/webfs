@@ -92,6 +92,7 @@ static int getattr_callback(const char *path, struct stat *stbuf)
   if (node != NULL) {
     stbuf->st_mode = S_IFREG | 0777;
     stbuf->st_nlink = 1;
+    stbuf->st_size = node->size;
     return res;
   }
 
@@ -129,7 +130,7 @@ static int open_callback(const char *path, struct fuse_file_info *fi)
 static int read_callback(const char *path, char *buf, size_t size, off_t offset,
     struct fuse_file_info *fi)
 {
-  size_t len = 0;
+  size_t len;
   (void) fi;
 
   node_t *node = find_node(path, get_root_node(), 0);
@@ -138,17 +139,23 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
     return -ENOENT;
   }
 
-  char *dummy_file_content = "just an example";
-  len = strlen(dummy_file_content);
+  len = node->size;
 
   if (offset < len) {
     if (offset + size > len) {
       size = len - offset;
     }
-    memcpy(buf, dummy_file_content + offset, size);
+
+    if (!sizeof(node->location)/sizeof(node->location[0]) > 0) {
+      return 0;
+    }
+
+    const char *content = storage_read(node->location[0]->location);
+    memcpy(buf, content + offset, size);
+    return size;
   }
 
-  return size;
+  return 0;
 }
 
 static int write_callback(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
@@ -157,8 +164,9 @@ static int write_callback(const char *path, const char *buf, size_t size, off_t 
   char *result = storage_write(buf);
   node->location = malloc(sizeof(node_location_t *));
   node_location_t *location = malloc(sizeof(char *));
-  location->location = "http://gist";
+  location->location = result;
   node->location[0] = location;
+  node->size = strlen(buf);
   return size;
 }
 
