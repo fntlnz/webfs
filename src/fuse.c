@@ -10,9 +10,6 @@
 #include "storage/gist.h"
 #include "tree.h"
 
-static const char *dummy_file_content = "I'm an example file used until we implement a mapping for storage\n";
-static const char *dummy_file_path = "/dummy";
-
 static node_t *root_node;
 
 static node_t *get_root_node()
@@ -24,7 +21,7 @@ static node_t *get_root_node()
   root_node->type = TYPE_FOLDER;
   root_node->name = "";
   root_node->num_children = 0;
-  root_node->children = malloc(sizeof(node_t));
+  root_node->children = malloc(sizeof(node_t*));
   return root_node;
 }
 
@@ -40,18 +37,42 @@ static void add_child(node_t *parent, const char *file_name)
   parent->children[parent->num_children - 1] = curnode;
 }
 
-static node_t *find_node(const char *path, node_t *root)
+static char **split_path(const char *src)
+{
+  const char *separator = "/";
+  char *tok = strtok(strdup(src), separator);
+
+  if(tok == NULL) {
+    return NULL;
+  }
+
+  char **nodes = malloc(sizeof(char *));
+  nodes[0] = tok;
+  int nodes_num = 1;
+  while((tok = strtok(NULL, separator)))  {
+    nodes = realloc(nodes, sizeof(nodes) * sizeof(char));
+    nodes[nodes_num] = tok;
+    nodes_num++;
+  }
+  return nodes;
+}
+
+static node_t *find_node(const char *path, node_t *root, int level)
 {
   int i;
   int count = (int) root->num_children;
+  char **path_arr = split_path(path);
+
   for (i = 0; i < count; i++) {
-    node_t *child = root->children[i];
-    // TODO: its just a one level stub for now I have to allow search in subpaths
-    char *npath = strdup(path);
-    if (strcmp(child->name, basename(npath)) == 0) {
-      return child;
+    node_t *node = root->children[i];
+    if (strcmp(node->name, path_arr[level]) == 0) {
+      if (sizeof(path_arr) / sizeof(char *) == level + 1) {
+        return node;
+      }
+      return find_node(path, node, level+1);
     }
   }
+
   return NULL;
 }
 
@@ -66,14 +87,7 @@ static int getattr_callback(const char *path, struct stat *stbuf)
     return res;
   }
 
-  if (strcmp(path, dummy_file_path) == 0) {
-    stbuf->st_mode = S_IFREG | 0777;
-    stbuf->st_nlink = 1;
-    stbuf->st_size = strlen(dummy_file_content);
-    return res;
-  }
-
-  node_t *node = find_node(path, get_root_node());
+  node_t *node = find_node(path, get_root_node(), 0);
 
   if (node != NULL) {
     stbuf->st_mode = S_IFREG | 0777;
@@ -96,7 +110,13 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
 
   filler(buf, ".", NULL, 0);
   filler(buf, "..", NULL, 0);
-  filler(buf, dummy_file_path + 1, NULL, 0);
+
+  int i;
+  node_t *root = get_root_node();
+  int count = (int) root->num_children;
+  for (i = 0; i < count; i++) {
+    filler(buf, root->children[i]->name, NULL, 0);
+  }
 
   return 0;
 }
@@ -112,10 +132,13 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
   size_t len = 0;
   (void) fi;
 
-  if(strcmp(path, dummy_file_path) != 0) {
+  node_t *node = find_node(path, get_root_node(), 0);
+
+  if (node == NULL) {
     return -ENOENT;
   }
 
+  char *dummy_file_content = "just an example";
   len = strlen(dummy_file_content);
 
   if (offset < len) {
@@ -130,8 +153,12 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
 
 static int write_callback(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
-  node_t *node = find_node(path, get_root_node());
-  /*char *result = storage_write(buf);*/
+  node_t *node = find_node(path, get_root_node(), 0);
+  char *result = storage_write(buf);
+  node->location = malloc(sizeof(node_location_t *));
+  node_location_t *location = malloc(sizeof(char *));
+  location->location = "http://gist";
+  node->location[0] = location;
   return size;
 }
 
