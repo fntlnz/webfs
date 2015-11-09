@@ -162,6 +162,9 @@ static int write_callback(const char *path, const char *buf, size_t size, off_t 
 {
   node_t *node = find_node(path, get_root_node(), 0);
   char *result = storage_write(buf);
+  if (result == NULL) {
+    return 0;
+  }
   node->location = malloc(sizeof(node_location_t *));
   node_location_t *location = malloc(sizeof(char *));
   location->location = result;

@@ -12,8 +12,11 @@ struct string {
   size_t len;
 };
 
-json_value *get_json_object_value_at_key(json_value *json, const char *key)
+static json_value *get_json_object_value_at_key(json_value *json, const char *key)
 {
+  if (json == NULL) {
+    return NULL;
+  }
   if (json->type != json_object) {
     return NULL;
   }
@@ -28,7 +31,7 @@ json_value *get_json_object_value_at_key(json_value *json, const char *key)
   return NULL;
 }
 
-void init_string(struct string *s)
+static void init_string(struct string *s)
 {
   s->len = 0;
   s->ptr = (char *) malloc(s->len + 1);
@@ -39,7 +42,7 @@ void init_string(struct string *s)
   s->ptr[0] = '\0';
 }
 
-size_t writefunc(void *ptr, size_t size, size_t nmemb, struct string *s)
+static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct string *s)
 {
   size_t new_len = s->len + size * nmemb;
   s->ptr = (char *) realloc(s->ptr, new_len + 1);
@@ -73,8 +76,6 @@ char *storage_write(const char *buf)
   char *req_json = malloc(sizeof(char) * total_length);
   sprintf(req_json, template, encoded_output);
 
-  //TODO: check here for memory allocation and sprintf
-  // encrypt the file with openssl
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, req_json);
 
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
@@ -83,9 +84,15 @@ char *storage_write(const char *buf)
   init_string(&s);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
   CURLcode ret = curl_easy_perform(curl);
+  if (ret != CURLE_OK) {
+    printf("errore");
+  }
   json_value *json = json_parse(s.ptr, s.len);
 
   json_value *file = get_json_object_value_at_key(get_json_object_value_at_key(get_json_object_value_at_key(json, "files"), "webfs"), "raw_url");
+  if (file == NULL) {
+    return NULL;
+  }
  
   return file->u.string.ptr;
 }
