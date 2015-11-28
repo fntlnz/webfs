@@ -22,12 +22,12 @@ enum NodeType {
 class Node {
  public:
   std::string name;
-  std::vector<Node> children;
+  std::vector<Node *> children;
   NodeType type;
 };
 
 typedef bool (*NodeFilterFunc)(Node);
 
-std::experimental::optional<Node> findNodeByPath(Node root, std::string fullPath);
+Node *findNodeByPath(Node *root, std::string fullPath);
 }
 #endif
