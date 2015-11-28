@@ -1,3 +1,6 @@
-[submodule "vendor/json-parser"]
-	path = vendor/json-parser
-	url = git@github.com:udp/json-parser.git
+[submodule "vendor/googletest"]
+	path = vendor/googletest
+	url = git@github.com:google/googletest.git
+[submodule "vendor/rapidjson"]
+	path = vendor/rapidjson
+	url = git@github.com:miloyip/rapidjson.git
