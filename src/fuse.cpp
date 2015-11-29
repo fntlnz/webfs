@@ -1,3 +1,4 @@
+#include "fuse_main.h"
 #include "node.h"
 #include <iostream>
 
@@ -84,7 +85,9 @@ static fuse_operations get_ops() {
   return webfs_fuse_ops;
 }
 
-int main(int argc, char *argv[]) {
+} // extern "C"
+
+int mount(int argc, char *argv[]) {
 
   webfs::Node *root = new webfs::Node;
   root->type = webfs::NodeType::BRANCH;
@@ -109,5 +112,4 @@ int main(int argc, char *argv[]) {
   //fuse_operations ops = get_ops();
   //return fuse_main(argc, argv, &ops, NULL);
 }
-} // extern "C"
 

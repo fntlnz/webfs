@@ -8,3 +8,5 @@ Testing/
 CTestTestfile.cmake
 bin/
 lib/
+vendor/
+html/

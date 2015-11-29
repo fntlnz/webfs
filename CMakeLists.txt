@@ -10,7 +10,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 
+enable_testing()
+
 add_subdirectory(src)
+add_subdirectory(test)
 
 add_custom_target(vcs-clean
         COMMAND find . -name "CMakeFiles" | xargs rm -rfv
