@@ -88,28 +88,7 @@ static fuse_operations get_ops() {
 } // extern "C"
 
 int mount(int argc, char *argv[]) {
-
-  webfs::Node *root = new webfs::Node;
-  root->type = webfs::NodeType::BRANCH;
-  root->name = "";
-
-  webfs::Node *folder = new webfs::Node;
-  folder->type = webfs::NodeType::BRANCH;
-  folder->name =  "folder";
-  root->children.push_back(folder);
-
-  webfs::Node *filetxt = new webfs::Node;
-  filetxt->type = webfs::NodeType::LEAF;
-  filetxt->name = "file.txt";
-  folder->children.push_back(filetxt);
-
-  webfs::Node *node = webfs::findNodeByPath(root, "/folder/file.txt");
-
-  if (node) {
-    std::cout << node->name << std::endl;
-    return 0;
-  }
-  //fuse_operations ops = get_ops();
-  //return fuse_main(argc, argv, &ops, NULL);
+  fuse_operations ops = get_ops();
+  return fuse_main(argc, argv, &ops, NULL);
 }
 

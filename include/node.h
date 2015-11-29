@@ -1,3 +1,7 @@
+/*!
+ * \file node.h
+ * \brief Definition of Node, NodeType and Node traversing functions
+ */
 #include <string>
 #include <vector>
 #include <numeric>
@@ -13,6 +17,10 @@ enum NodeType {
   LEAF,
 };
 
+/*!
+ * Main Node Data structure used to store local file metadata
+ * for mapping with the external storage
+ */
 class Node {
  public:
   std::string name;
@@ -22,6 +30,9 @@ class Node {
 
 typedef bool (*NodeFilterFunc)(Node);
 
+/*! 
+ * \brief Look for the Node at the given path recursively starting from the provided root
+ */
 Node *findNodeByPath(Node *root, std::string fullPath);
 }
 #endif
