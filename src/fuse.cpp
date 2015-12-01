@@ -22,7 +22,7 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
     p = "";
   }
 
-  webfs::Node *node = webfs::findNodeByPath(root, p);
+  webfs::Node *node = root->findChild(p);
 
   if (node == NULL) {
     return -ENOENT;
@@ -50,7 +50,7 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
   (void) fi;
   std::string p = std::string(path, strlen(path));
 
-  webfs::Node *node = webfs::findNodeByPath(root, p);
+  webfs::Node *node = root->findChild(p);
 
   if (node == NULL) {
     return -ENOENT;
@@ -87,6 +87,8 @@ static int mknod_callback(const char *path, mode_t mode, dev_t dev) {
 }
 
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
+  std::string p = std::string(path, strlen(path));
+  webfs::Node *node = root->findChild(p);
   return 0;
 }
 
@@ -135,8 +137,8 @@ int mount(int argc, char *argv[]) {
   auto folder = new webfs::Node();
   folder->type = webfs::NodeType::BRANCH;
   folder->name = "folder";
-  root->children.push_back(folder);
- 
+  root->addChild(folder);
+
   init_fuse_operations();
 
   fuse_operations ops = init_fuse_operations();

@@ -4,7 +4,29 @@
 class NodeTest : public ::testing::Test {
 };
 
-TEST_F(NodeTest, TestFindNode) {
+TEST_F(NodeTest, TestFindClosestParent) {
+  auto *root = new webfs::Node();
+  root->name = "";
+  root->type = webfs::NodeType::BRANCH;
+
+  auto *folder = new webfs::Node();
+  folder->name = "folder";
+  folder->type = webfs::NodeType::BRANCH;
+
+  root->addChild(folder);
+
+  auto *closestParent = root->findClosestParent("/example.txt");
+  EXPECT_EQ(closestParent, root);
+
+  auto *closestFolderParent = root->findClosestParent("/folder/example.txt");
+  EXPECT_EQ(closestFolderParent, folder);
+
+  auto *closestFolderSubParent = root->findClosestParent("/folder/a/non-existing/strange/superlong/and/drammatically/silly/folder/containing/a/file.txt");
+
+  EXPECT_EQ(closestFolderSubParent, folder);
+}
+
+TEST_F(NodeTest, TestFindChild) {
   auto *root = new webfs::Node();
   root->name = "";
   root->type = webfs::NodeType::BRANCH;
@@ -25,11 +47,20 @@ TEST_F(NodeTest, TestFindNode) {
   file->name = "myawesome.txt";
   file->type = webfs::NodeType::LEAF;
 
-  subfolder->children.push_back(file);
-  folder->children.push_back(subfolder);
-  root->children.push_back(folder);
-  root->children.push_back(folder2);
+  subfolder->addChild(file);
+  folder->addChild(subfolder);
+  root->addChild(folder);
+  root->addChild(folder2);
 
-  auto *found = webfs::findNodeByPath(root, "/folder/subfolder/myawesome.txt");
+  auto *found = root->findChild("/folder/subfolder/myawesome.txt");
   EXPECT_EQ(found, file);
+
+  auto *foundInFolder = folder->findChild("/subfolder/myawesome.txt");
+  EXPECT_EQ(foundInFolder, file);
+
+  auto *foundInSubfolder = subfolder->findChild("/myawesome.txt");
+  EXPECT_EQ(foundInSubfolder, file);
+
+  auto *foundFolder = root->findChild("/folder2");
+  EXPECT_EQ(foundFolder, folder2);
 }

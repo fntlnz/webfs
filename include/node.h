@@ -1,4 +1,4 @@
-/*!
+/**
  * \file node.h
  * \brief Definition of Node, NodeType and Node traversing functions
  */
@@ -17,22 +17,29 @@ enum NodeType {
   LEAF,
 };
 
-/*!
- * Main Node Data structure used to store local file metadata
- * for mapping with the external storage
+/**
+ * Main Node Data structure used to store local file metadata for mapping with
+ * external storage
  */
 class Node {
  public:
   std::string name;
-  std::vector<Node *> children;
+  Node *parent;
   NodeType type;
+  std::vector<Node *> children;
+
+  /**
+   * Add a child to the current Node
+   */
+  void addChild(Node *child);
+
+  /**
+   * Find the node at the provided relativePath (relative to the current node)
+   * starting from the current Node.
+   */
+  Node *findChild(std::string relativePath);
+
+  Node *findClosestParent(std::string relativePath);
 };
-
-typedef bool (*NodeFilterFunc)(Node);
-
-/*! 
- * \brief Look for the Node at the given path recursively starting from the provided root
- */
-Node *findNodeByPath(Node *root, std::string fullPath);
 }
 #endif
