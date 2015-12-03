@@ -1,10 +1,20 @@
 #include "gtest/gtest.h"
 #include "node.h"
 
-class NodeTest : public ::testing::Test {
-};
+TEST(NodeTest, TestAddChild) {
+  auto *root = new webfs::Node();
+  root->name = "";
+  root->type = webfs::NodeType::BRANCH;
 
-TEST_F(NodeTest, TestFindClosestParent) {
+  auto *child = new webfs::Node();
+  child->name = "file.txt";
+  child->type = webfs::NodeType::LEAF;
+  root->addChild(child);
+
+  EXPECT_EQ(child, root->children.front());
+}
+
+TEST(NodeTest, TestFindParent) {
   auto *root = new webfs::Node();
   root->name = "";
   root->type = webfs::NodeType::BRANCH;
@@ -15,18 +25,18 @@ TEST_F(NodeTest, TestFindClosestParent) {
 
   root->addChild(folder);
 
-  auto *closestParent = root->findClosestParent("/example.txt");
-  EXPECT_EQ(closestParent, root);
+  auto *parent = root->findParent("/example.txt");
+  EXPECT_EQ(parent, root);
 
-  auto *closestFolderParent = root->findClosestParent("/folder/example.txt");
-  EXPECT_EQ(closestFolderParent, folder);
+  auto *folderParent = root->findParent("/folder/example.txt");
+  EXPECT_EQ(folderParent, folder);
 
-  auto *closestFolderSubParent = root->findClosestParent("/folder/a/non-existing/strange/superlong/and/drammatically/silly/folder/containing/a/file.txt");
+  auto *closestFolderSubParent = root->findParent("/folder/a/non-existing/strange/superlong/and/drammatically/silly/folder/containing/a/file.txt");
 
-  EXPECT_EQ(closestFolderSubParent, folder);
+  EXPECT_EQ(NULL, closestFolderSubParent);
 }
 
-TEST_F(NodeTest, TestFindChild) {
+TEST(NodeTest, TestFindChild) {
   auto *root = new webfs::Node();
   root->name = "";
   root->type = webfs::NodeType::BRANCH;

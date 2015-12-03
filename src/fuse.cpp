@@ -13,7 +13,6 @@
 webfs::Node *root;
 static struct fuse_operations webfs_fuse_ops;
 
-
 static int getattr_callback(const char *path, struct stat *stbuf) {
   memset(stbuf, 0, sizeof(struct stat));
   std::string p = std::string(path, strlen(path));
@@ -50,18 +49,14 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
   (void) fi;
   std::string p = std::string(path, strlen(path));
 
-  webfs::Node *node = root->findChild(p);
-
-  if (node == NULL) {
-    return -ENOENT;
-  }
-
   filler(buf, ".", NULL, 0);
   filler(buf, "..", NULL, 0);
 
-  for(auto n : node->children) {
+  auto parent = root->findChild(path);
+  for(auto n : parent->children) {
     filler(buf, n->name.c_str(), NULL, 0);
   }
+
   return 0;
 }
 
@@ -88,7 +83,30 @@ static int mknod_callback(const char *path, mode_t mode, dev_t dev) {
 
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
   std::string p = std::string(path, strlen(path));
-  webfs::Node *node = root->findChild(p);
+  webfs::Node *parent = root->findParent(p);
+
+  webfs::Node *curNode = new webfs::Node();
+  curNode->type = webfs::NodeType::LEAF;
+  curNode->name = webfs::utils::explode(p, '/').back();
+  parent->addChild(curNode);
+
+  return 0;
+}
+
+static int utime_callback(const char *path, struct utimbuf *buf) {
+  // TODO: handle utime in a proper way.
+  return 0;
+}
+
+static int mkdir_callback(const char *path, mode_t mode) {
+  std::string p = std::string(path, strlen(path));
+
+  webfs::Node *parent = root->findParent(p);
+
+  webfs::Node *curNode = new webfs::Node();
+  curNode->type = webfs::NodeType::BRANCH;
+  curNode->name = webfs::utils::explode(p, '/').back();
+  parent->addChild(curNode);
   return 0;
 }
 
@@ -99,7 +117,7 @@ static fuse_operations init_fuse_operations() {
   webfs_fuse_ops.readlink = NULL;
   webfs_fuse_ops.getdir = NULL;
   webfs_fuse_ops.mknod = mknod_callback;
-  webfs_fuse_ops.mkdir = NULL;
+  webfs_fuse_ops.mkdir = mkdir_callback;
   webfs_fuse_ops.unlink = NULL;
   webfs_fuse_ops.rmdir = NULL;
   webfs_fuse_ops.symlink = NULL;
@@ -108,11 +126,12 @@ static fuse_operations init_fuse_operations() {
   webfs_fuse_ops.chmod = NULL;
   webfs_fuse_ops.chown = NULL;
   webfs_fuse_ops.truncate = truncate_callback;
-  webfs_fuse_ops.utime = NULL;
+  webfs_fuse_ops.utime = utime_callback;
   webfs_fuse_ops.open = open_callback;
   webfs_fuse_ops.read = read_callback;
   webfs_fuse_ops.write = write_callback;
   webfs_fuse_ops.flush = NULL;
+  webfs_fuse_ops.create = create_callback;
   webfs_fuse_ops.release = NULL;
   webfs_fuse_ops.fsync = NULL;
   webfs_fuse_ops.setxattr = NULL;

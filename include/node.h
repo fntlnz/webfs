@@ -39,7 +39,7 @@ class Node {
    */
   Node *findChild(std::string relativePath);
 
-  Node *findClosestParent(std::string relativePath);
+  Node *findParent(std::string relativePath);
 };
 }
 #endif

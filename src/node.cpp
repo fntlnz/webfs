@@ -2,7 +2,7 @@
 
 using namespace webfs;
 
-Node *findInChildren(Node *parent, std::string currentName) {
+static Node *findInChildren(Node *parent, std::string currentName) {
   for (auto &node : parent->children) {
     if (node->name == currentName) {
       return node;
@@ -16,16 +16,10 @@ void Node::addChild(Node *child) {
   child->parent = this;
 }
 
-Node *Node::findClosestParent(std::string relativePath) {
-  auto splittedPath = webfs::utils::explode(relativePath, '/');
-  return std::accumulate(splittedPath.begin(), splittedPath.end(), this,
-      [](Node *accumulator, std::string currentName) {
-        auto node = accumulator->findChild(accumulator->name + '/' + currentName);
-        if (!node) {
-          return accumulator;
-        }
-        return node;
-      });
+Node *Node::findParent(std::string relativePath) {
+  auto lastName = webfs::utils::explode(relativePath, '/').back();
+  relativePath.erase(relativePath.length() - lastName.length(), lastName.length());
+  return findChild(relativePath);
 }
 
 Node *Node::findChild(std::string relativePath) {
@@ -36,11 +30,15 @@ Node *Node::findChild(std::string relativePath) {
   auto splittedPath = webfs::utils::explode(relativePath, '/');
 
   return std::accumulate(splittedPath.begin(), splittedPath.end(), this,
-      [](Node *accumulator, std::string currentName) {
+      [](Node *accumulator, std::string currentName) -> Node * {
+        if (accumulator == NULL) {
+          return accumulator;
+        }
         if (accumulator->type == NodeType::LEAF) {
           if (accumulator->name == currentName) {
             return accumulator;
           }
+          return NULL;
         }
 
         if (accumulator->type == NodeType::BRANCH) {
@@ -50,6 +48,6 @@ Node *Node::findChild(std::string relativePath) {
           }
         }
 
-        return accumulator;
+        return NULL;
       });
 }

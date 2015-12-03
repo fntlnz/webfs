@@ -7,6 +7,9 @@ std::vector<std::string> webfs::utils::explode(std::string const & s, char delim
   std::istringstream iss(s);
 
   for (std::string token; std::getline(iss, token, delim); ) {
+    if (token.empty()) {
+      continue;
+    }
     result.push_back(std::move(token));
   }
 
