@@ -1,4 +1,3 @@
-#include "fuse_main.h"
 #include "node.h"
 #include <iostream>
 
@@ -148,7 +147,7 @@ static fuse_operations init_fuse_operations() {
 
 } // extern "C"
 
-int mount(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   root = new webfs::Node();
   root->type = webfs::NodeType::BRANCH;
   root->name = "";

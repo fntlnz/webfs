@@ -11,6 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(src)
+add_subdirectory(fuse)
 
 enable_testing()
 add_subdirectory(test)
