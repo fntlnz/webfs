@@ -17,9 +17,17 @@ void Node::addChild(Node *child) {
 }
 
 Node *Node::findParent(std::string relativePath) {
-  auto lastName = webfs::utils::explode(relativePath, '/').back();
-  relativePath.erase(relativePath.length() - lastName.length(), lastName.length());
-  return findChild(relativePath);
+  auto splittedPath = webfs::utils::explode(relativePath, '/');
+  return std::accumulate(splittedPath.begin(), splittedPath.end(), this,
+      [](Node *accumulator, std::string currentName) -> Node * {
+        if (accumulator->type == NodeType::BRANCH) {
+          auto c = findInChildren(accumulator, currentName);
+          if (c != nullptr) {
+            return c;
+          }
+        }
+        return accumulator;
+      });
 }
 
 Node *Node::findChild(std::string relativePath) {
@@ -31,23 +39,23 @@ Node *Node::findChild(std::string relativePath) {
 
   return std::accumulate(splittedPath.begin(), splittedPath.end(), this,
       [](Node *accumulator, std::string currentName) -> Node * {
-        if (accumulator == NULL) {
+        if (accumulator == nullptr) {
           return accumulator;
         }
         if (accumulator->type == NodeType::LEAF) {
           if (accumulator->name == currentName) {
             return accumulator;
           }
-          return NULL;
+          return nullptr;
         }
 
         if (accumulator->type == NodeType::BRANCH) {
           Node *c = findInChildren(accumulator, currentName);
-          if (c) {
+          if (c != nullptr) {
             return c;
           }
         }
 
-        return NULL;
+        return nullptr;
       });
 }

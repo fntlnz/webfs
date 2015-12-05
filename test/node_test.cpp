@@ -33,7 +33,7 @@ TEST(NodeTest, TestFindParent) {
 
   auto *closestFolderSubParent = root->findParent("/folder/a/non-existing/strange/superlong/and/drammatically/silly/folder/containing/a/file.txt");
 
-  EXPECT_EQ(NULL, closestFolderSubParent);
+  EXPECT_EQ(folder, closestFolderSubParent);
 }
 
 TEST(NodeTest, TestFindChild) {
