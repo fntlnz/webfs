@@ -42,6 +42,10 @@ class Node {
 	  return name;
   }
 
+  const Type& getType()const {
+	  return type;
+  }
+
   const std::vector<Node*> getChild(){
 	  return children;
   }
@@ -55,6 +59,7 @@ class Node {
     const Type type;
     std::vector<Node *> children;
 
-};
-}
+};//Node
+
+}//webfs namespace
 #endif

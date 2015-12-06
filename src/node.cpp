@@ -11,7 +11,7 @@ Node *Node::findInChildren(const std::string &currentName) {
     }
   }
   return nullptr;
-};
+}
 
 void Node::addChild(Node *child) {
   children.push_back(child);

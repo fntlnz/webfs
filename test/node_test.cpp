@@ -10,7 +10,7 @@ TEST(NodeTest, TestAddChild) {
 
     root.addChild(&child);
 
-    EXPECT_EQ(1, root.getChild().size());
+    EXPECT_EQ(1u, root.getChild().size());
     EXPECT_EQ(&child, root.getChild().front());
 
 }
