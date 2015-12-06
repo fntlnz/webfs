@@ -2,8 +2,8 @@ find_package(Threads REQUIRED)
 
 include(DownloadGoogleTest)
 include(DownloadGoogleMock)
-add_executable(webfstest main.cpp node_test.cpp)
+add_executable(libwebfstest main.cpp node_test.cpp)
 
 include_directories(${COMMON_INCLUDES})
 
-target_link_libraries(webfstest libwebfs libgtest libgmock)
+target_link_libraries(libwebfstest libwebfs libgtest libgmock)

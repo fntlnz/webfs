@@ -11,11 +11,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(src)
-add_subdirectory(fuse)
+add_subdirectory(fuse EXCLUDE_FROM_ALL)
 
 enable_testing()
 add_subdirectory(test)
-add_test(webfstest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/webfstest)
+add_test(wlibebfstest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/libwebfstest)
 add_custom_target(vcs-clean
         COMMAND find . -name "CMakeFiles" | xargs rm -rfv
         COMMAND find . -name "Makefile" | xargs rm -rfv

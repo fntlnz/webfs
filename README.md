@@ -1,17 +1,6 @@
 # webFS
 
-Web backed filesystem
+The main goal of this project is to create a filesystem that can use online services (like gist, pastebin etc..) via FUSE to store data.
 
-## Development
-
-Compile a debug enabled binary
-```
-cmake -DCMAKE_BUILD_TYPE=Debug .
-make -j
-```
-
-Use it
-```
-./bin/webfs -d -s -f
-```
+This project is under development, if you whish to help see the [CONTRIBUTING.md](CONTRIBUTING.md) file
 
