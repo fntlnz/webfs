@@ -85,8 +85,8 @@ static int create_callback(const char *path, mode_t mode, struct fuse_file_info 
   webfs::Node *parent = root->findParent(p);
 
   webfs::Node *curNode = new webfs::Node(
-		  webfs::utils::explode(p, '/').back(),
-		  webfs::Node::Type::LEAF);
+      webfs::utils::explode(p, '/').back(),
+      webfs::Node::Type::LEAF);
   parent->addChild(curNode);
 
   return 0;
@@ -103,8 +103,8 @@ static int mkdir_callback(const char *path, mode_t mode) {
   webfs::Node *parent = root->findParent(p);
 
   webfs::Node *curNode = new webfs::Node(
-		  webfs::utils::explode(p, '/').back(),
-		  webfs::Node::Type::BRANCH);
+      webfs::utils::explode(p, '/').back(),
+      webfs::Node::Type::BRANCH);
   parent->addChild(curNode);
   return 0;
 }

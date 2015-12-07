@@ -16,14 +16,14 @@ namespace webfs {
  * external storage
  */
 class Node {
- public:
-	enum class Type {
-	  BRANCH,
-	  LEAF,
-	};
+  public:
+    enum class Type {
+      BRANCH,
+      LEAF,
+    };
 
-  Node(const std::string &n,const Type t):
-	  name(n),parent(nullptr),type(t),children(){}
+    Node(const std::string &n,const Type t):
+      name(n),parent(nullptr),type(t){}
 
   /**
    * Add a child to the current Node
@@ -39,22 +39,22 @@ class Node {
   Node *findParent(const std::string &relativePath);
 
   const std::string& getName()const{
-	  return name;
+    return name;
   }
 
   const Type& getType()const {
-	  return type;
+    return type;
   }
 
   const std::vector<Node*> getChild(){
-	  return children;
+    return children;
   }
 
- private:
+  private:
 
-  	Node* findInChildren(const std::string &currentName);
+    Node* findInChildren(const std::string &currentName);
 
-  	std::string name;
+    std::string name;
     Node *parent;
     const Type type;
     std::vector<Node *> children;

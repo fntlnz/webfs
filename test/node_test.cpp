@@ -2,41 +2,41 @@
 #include "node.h"
 
 TEST(NodeTest, TestAddChild) {
-	using namespace webfs;
+  using namespace webfs;
 
-	Node root("",Node::Type::BRANCH);
+  Node root("",Node::Type::BRANCH);
 
-    Node child("file.txt",Node::Type::LEAF);
+  Node child("file.txt",Node::Type::LEAF);
 
-    root.addChild(&child);
+  root.addChild(&child);
 
-    EXPECT_EQ(1u, root.getChild().size());
-    EXPECT_EQ(&child, root.getChild().front());
+  EXPECT_EQ(1u, root.getChild().size());
+  EXPECT_EQ(&child, root.getChild().front());
 
 }
 
 TEST(NodeTest, TestFindParent) {
-	using namespace webfs;
+  using namespace webfs;
 
-	Node root("",Node::Type::BRANCH);
-	Node folder( "folder",Node::Type::BRANCH);
+  Node root("",Node::Type::BRANCH);
+  Node folder( "folder",Node::Type::BRANCH);
 
-	root.addChild(&folder);
+  root.addChild(&folder);
 
-	auto *parent = root.findParent("/example.txt");
-	EXPECT_EQ(parent, &root);
+  auto *parent = root.findParent("/example.txt");
+  EXPECT_EQ(parent, &root);
 
-	auto *folderParent = root.findParent("/folder/example.txt");
-	EXPECT_EQ(folderParent, &folder);
+  auto *folderParent = root.findParent("/folder/example.txt");
+  EXPECT_EQ(folderParent, &folder);
 
-	auto *closestFolderSubParent = root.findParent("/folder/a/non-existing/strange/superlong/and/drammatically/silly/folder/containing/a/file.txt");
+  auto *closestFolderSubParent = root.findParent("/folder/a/non-existing/strange/superlong/and/drammatically/silly/folder/containing/a/file.txt");
 
-	EXPECT_EQ(&folder, closestFolderSubParent);
+  EXPECT_EQ(&folder, closestFolderSubParent);
 }
 
 
 TEST(NodeTest, TestFindChild) {
-	using namespace webfs;
+  using namespace webfs;
 
   Node root ("",Node::Type::BRANCH);
 
