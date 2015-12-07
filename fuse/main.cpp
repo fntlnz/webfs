@@ -4,7 +4,7 @@
 #define FUSE_USE_VERSION 26
 
 #include <fuse.h>
-#include <string.h>
+#include <cstring>
 #ifdef HAVE_SETXATTR
 #include <sys/xattr.h>
 #endif
@@ -14,7 +14,7 @@ static struct fuse_operations webfs_fuse_ops;
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
   memset(stbuf, 0, sizeof(struct stat));
-  std::string p = std::string(path, strlen(path));
+  std::string p(path);
 
   if (p == "/") {
     p = "";
@@ -26,14 +26,14 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
     return -ENOENT;
   }
 
-  if (node->type == webfs::NodeType::LEAF) {
+  if (node->getType() == webfs::Node::Type::LEAF) {
     stbuf->st_mode = S_IFREG | 0777;
     stbuf->st_nlink = 1;
     stbuf->st_size = 10; // TODO: add size to node
     return 0;
   }
 
-  if (node->type == webfs::NodeType::BRANCH) {
+  if (node->getType() == webfs::Node::Type::BRANCH) {
     stbuf->st_mode = S_IFDIR | 0755;
     stbuf->st_nlink = 2;
     return 0;
@@ -51,9 +51,9 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
   filler(buf, ".", NULL, 0);
   filler(buf, "..", NULL, 0);
 
-  auto parent = root->findChild(path);
-  for(auto n : parent->children) {
-    filler(buf, n->name.c_str(), NULL, 0);
+  const auto parent = root->findChild(path);
+  for(const auto n : parent->getChild()) {
+    filler(buf, n->getName().c_str(), NULL, 0);
   }
 
   return 0;
@@ -81,12 +81,12 @@ static int mknod_callback(const char *path, mode_t mode, dev_t dev) {
 }
 
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
-  std::string p = std::string(path, strlen(path));
+	const std::string p(path);
   webfs::Node *parent = root->findParent(p);
 
-  webfs::Node *curNode = new webfs::Node();
-  curNode->type = webfs::NodeType::LEAF;
-  curNode->name = webfs::utils::explode(p, '/').back();
+  webfs::Node *curNode = new webfs::Node(
+      webfs::utils::explode(p, '/').back(),
+      webfs::Node::Type::LEAF);
   parent->addChild(curNode);
 
   return 0;
@@ -98,13 +98,13 @@ static int utime_callback(const char *path, struct utimbuf *buf) {
 }
 
 static int mkdir_callback(const char *path, mode_t mode) {
-  std::string p = std::string(path, strlen(path));
+  const std::string p(path);
 
   webfs::Node *parent = root->findParent(p);
 
-  webfs::Node *curNode = new webfs::Node();
-  curNode->type = webfs::NodeType::BRANCH;
-  curNode->name = webfs::utils::explode(p, '/').back();
+  webfs::Node *curNode = new webfs::Node(
+      webfs::utils::explode(p, '/').back(),
+      webfs::Node::Type::BRANCH);
   parent->addChild(curNode);
   return 0;
 }
@@ -148,13 +148,9 @@ static fuse_operations init_fuse_operations() {
 } // extern "C"
 
 int main(int argc, char *argv[]) {
-  root = new webfs::Node();
-  root->type = webfs::NodeType::BRANCH;
-  root->name = "";
+  root = new webfs::Node("",webfs::Node::Type::BRANCH);
 
-  auto folder = new webfs::Node();
-  folder->type = webfs::NodeType::BRANCH;
-  folder->name = "folder";
+  auto folder = new webfs::Node("folder",webfs::Node::Type::BRANCH);
   root->addChild(folder);
 
   init_fuse_operations();

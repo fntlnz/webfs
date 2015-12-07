@@ -4,7 +4,6 @@
  */
 #include <string>
 #include <vector>
-#include <numeric>
 
 #include "utils.h"
 
@@ -12,21 +11,19 @@
 #define WEBFS_NODE_H_
 namespace webfs {
 
-enum NodeType {
-  BRANCH,
-  LEAF,
-};
-
 /**
  * Main Node Data structure used to store local file metadata for mapping with
  * external storage
  */
 class Node {
- public:
-  std::string name;
-  Node *parent;
-  NodeType type;
-  std::vector<Node *> children;
+  public:
+    enum class Type {
+      BRANCH,
+      LEAF,
+    };
+
+    Node(const std::string &n,const Type t):
+      name(n),parent(nullptr),type(t){}
 
   /**
    * Add a child to the current Node
@@ -37,9 +34,32 @@ class Node {
    * Find the node at the provided relativePath (relative to the current node)
    * starting from the current Node.
    */
-  Node *findChild(std::string relativePath);
+  Node *findChild(const std::string &relativePath);
 
-  Node *findParent(std::string relativePath);
-};
-}
+  Node *findParent(const std::string &relativePath);
+
+  const std::string& getName()const{
+    return name;
+  }
+
+  const Type& getType()const {
+    return type;
+  }
+
+  const std::vector<Node*> getChild(){
+    return children;
+  }
+
+  private:
+
+    Node* findInChildren(const std::string &currentName);
+
+    std::string name;
+    Node *parent;
+    const Type type;
+    std::vector<Node *> children;
+
+};//Node
+
+}//webfs namespace
 #endif
