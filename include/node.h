@@ -59,7 +59,7 @@ class Node {
     const Type type;
     std::vector<Node *> children;
 
-};//Node
+}; //Node
 
-}//webfs namespace
-#endif
+} // webfs namespace
+#endif // WEBFS_NODE_H_

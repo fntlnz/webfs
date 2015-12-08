@@ -1,4 +1,5 @@
 #include "node.h"
+#include "filesystem.h"
 #include <iostream>
 
 #define FUSE_USE_VERSION 26
@@ -9,7 +10,7 @@
 #include <sys/xattr.h>
 #endif
 
-webfs::Node *root;
+webfs::Filesystem *filesystem;
 static struct fuse_operations webfs_fuse_ops;
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
@@ -20,9 +21,9 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
     p = "";
   }
 
-  webfs::Node *node = root->findChild(p);
+  webfs::Node *node = filesystem->findNode(p);
 
-  if (node == NULL) {
+  if (node == nullptr) {
     return -ENOENT;
   }
 
@@ -51,8 +52,8 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
   filler(buf, ".", NULL, 0);
   filler(buf, "..", NULL, 0);
 
-  const auto parent = root->findChild(path);
-  for(const auto n : parent->getChild()) {
+  const auto directory = filesystem->findNode(p);
+  for(const auto n : directory->getChild()) {
     filler(buf, n->getName().c_str(), NULL, 0);
   }
 
@@ -81,14 +82,8 @@ static int mknod_callback(const char *path, mode_t mode, dev_t dev) {
 }
 
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
-	const std::string p(path);
-  webfs::Node *parent = root->findParent(p);
-
-  webfs::Node *curNode = new webfs::Node(
-      webfs::utils::explode(p, '/').back(),
-      webfs::Node::Type::LEAF);
-  parent->addChild(curNode);
-
+  const std::string p(path);
+  filesystem->createFile(p);
   return 0;
 }
 
@@ -99,13 +94,7 @@ static int utime_callback(const char *path, struct utimbuf *buf) {
 
 static int mkdir_callback(const char *path, mode_t mode) {
   const std::string p(path);
-
-  webfs::Node *parent = root->findParent(p);
-
-  webfs::Node *curNode = new webfs::Node(
-      webfs::utils::explode(p, '/').back(),
-      webfs::Node::Type::BRANCH);
-  parent->addChild(curNode);
+  filesystem->createDirectory(p);
   return 0;
 }
 
@@ -148,12 +137,11 @@ static fuse_operations init_fuse_operations() {
 } // extern "C"
 
 int main(int argc, char *argv[]) {
-  root = new webfs::Node("",webfs::Node::Type::BRANCH);
-
+  auto root = new webfs::Node("",webfs::Node::Type::BRANCH);
   auto folder = new webfs::Node("folder",webfs::Node::Type::BRANCH);
   root->addChild(folder);
 
-  init_fuse_operations();
+  filesystem = new webfs::Filesystem(root);
 
   fuse_operations ops = init_fuse_operations();
   return fuse_main(argc, argv, &ops, NULL);

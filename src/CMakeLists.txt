@@ -5,7 +5,7 @@ include(DownloadRapidJSON)
 
 include_directories(${COMMON_INCLUDES} ${FUSE_INCLUDE_DIR} ${CURL_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR} ${RAPIDJSON_INCLUDES})
 
-set(SOURCE_FILES node.cpp utils.cpp)
+set(SOURCE_FILES node.cpp utils.cpp filesystem.cpp)
 
 add_library(libwebfs STATIC ${SOURCE_FILES})
 

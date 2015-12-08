@@ -5,6 +5,6 @@
 namespace webfs {
 namespace utils {
 std::vector<std::string> explode(std::string const & s, char delim);
-}
-}
-#endif
+} // utils namespace
+} // webfs namespace
+#endif // WEBFS_UTILS_H_
