@@ -6,8 +6,8 @@ namespace webfs {
 class Filesystem {
   public:
     Filesystem(Node *root): rootNode(root){}
-    void createDirectory(const std::string &path);
-    void createFile(const std::string &path);
+    Node *createDirectory(const std::string &path);
+    Node *createFile(const std::string &path);
     Node *findNode(const std::string &path);
   private:
     Node *rootNode;

@@ -1,23 +1,27 @@
 #include "filesystem.h"
 
-void webfs::Filesystem::createDirectory(const std::string &path) {
-  webfs::Node *parent = rootNode->findParent(path);
+using namespace webfs;
 
-  webfs::Node *curNode = new webfs::Node(
-      webfs::utils::explode(path, '/').back(),
-      webfs::Node::Type::BRANCH);
+Node *Filesystem::createDirectory(const std::string &path) {
+  Node *parent = rootNode->findParent(path);
+
+  Node *curNode = new Node(
+      utils::explode(path, '/').back(),
+      Node::Type::BRANCH);
   parent->addChild(curNode);
+  return curNode;
 }
 
-void webfs::Filesystem::createFile(const std::string &path) {
-  webfs::Node *parent = rootNode->findParent(path);
+Node *Filesystem::createFile(const std::string &path) {
+  Node *parent = rootNode->findParent(path);
 
-  webfs::Node *curNode = new webfs::Node(
-      webfs::utils::explode(path, '/').back(),
-      webfs::Node::Type::LEAF);
+  Node *curNode = new Node(
+      utils::explode(path, '/').back(),
+      Node::Type::LEAF);
   parent->addChild(curNode);
+  return curNode;
 }
 
-webfs::Node *webfs::Filesystem::findNode(const std::string &path) {
+Node *Filesystem::findNode(const std::string &path) {
   return rootNode->findChild(path);
 }

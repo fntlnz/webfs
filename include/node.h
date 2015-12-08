@@ -46,7 +46,7 @@ class Node {
     return type;
   }
 
-  const std::vector<Node*> getChild(){
+  const std::vector<Node*> getChildren(){
     return children;
   }
 

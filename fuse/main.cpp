@@ -53,7 +53,7 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
   filler(buf, "..", NULL, 0);
 
   const auto directory = filesystem->findNode(p);
-  for(const auto n : directory->getChild()) {
+  for(const auto n : directory->getChildren()) {
     filler(buf, n->getName().c_str(), NULL, 0);
   }
 
