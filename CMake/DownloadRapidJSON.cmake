@@ -9,3 +9,5 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(rapidjson source_dir)
 include_directories("${source_dir}/include")
+#enable the std::strig wrapper function
+add_definitions(-DRAPIDJSON_HAS_STDSTRING)

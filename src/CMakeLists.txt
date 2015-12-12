@@ -5,7 +5,7 @@ find_package(OpenSSL REQUIRED)
 
 include_directories(${COMMON_INCLUDES} ${FUSE_INCLUDE_DIR} ${CURL_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
 
-set(SOURCE_FILES node.cpp utils.cpp filesystem.cpp gists/gistsRequest.cpp)
+set(SOURCE_FILES node.cpp utils.cpp filesystem.cpp)
 
 add_library(libwebfs STATIC ${SOURCE_FILES})
 #require the rapidjson library
