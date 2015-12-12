@@ -18,22 +18,15 @@ public:
     delete writer;
   }
 
-  void checkIsSameNode(const webfs::Node &node,const rapidjson::Value &jsonNode){
-    const bool isLeaf =node.getType()==webfs::Node::Type::LEAF;
+  void checkHasAllField(const rapidjson::Value &jsonNode){
 	EXPECT_TRUE(jsonNode.HasMember("isLeaf"));
-	EXPECT_EQ(isLeaf,jsonNode["isLeaf"].GetBool());
 	EXPECT_TRUE(jsonNode.HasMember("name"));
-	EXPECT_EQ(node.getName(),
-			jsonNode["name"].GetString());
-	EXPECT_TRUE(jsonNode.HasMember("name"));
-	if(!isLeaf){
+	if(!jsonNode["isLeaf"].GetBool()){
 	  EXPECT_TRUE(jsonNode.HasMember("children"));
-	  const std::vector<webfs::Node*>  childrenNode = node.getChildren();
 	  const rapidjson::Value &childrenJson = jsonNode["children"];
 	  EXPECT_TRUE(childrenJson.IsArray());
-	  EXPECT_EQ(childrenNode.size(),childrenJson.Size());
-	  for(uint32_t i=0; i<childrenNode.size();i++)
-	    checkIsSameNode(*childrenNode[i],childrenJson[i]);
+	  for(decltype(childrenJson.Size()) i=0; i<childrenJson.Size();i++)
+		  checkHasAllField(childrenJson[i]);
 	}//if
   }//isSameNode
 
@@ -55,8 +48,10 @@ TEST_F(NodeTestDumpJson, writeLeafNode) {
   Document readNode;
   readNode.Parse(buffer.GetString());
 
-  checkIsSameNode(root,readNode);
+  checkHasAllField(readNode);
 
+  Node rebuildNode(readNode);
+  EXPECT_EQ(root,rebuildNode);
 }
 
 TEST_F(NodeTestDumpJson, writeBranchNode) {
@@ -79,7 +74,10 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
   Document readNode;
   readNode.Parse(buffer.GetString());
 
-  checkIsSameNode(root,readNode);
+  checkHasAllField(readNode);
+
+  Node rebuildNode(readNode);
+  EXPECT_EQ(root,rebuildNode);
 
 }
 

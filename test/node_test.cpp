@@ -66,7 +66,55 @@ TEST(NodeTest, TestFindChild) {
   EXPECT_EQ(foundFolder, &folder2);
 }
 
+TEST(NodeEqualTest, NodeWithDifferentNameAreDifferent) {
+  using namespace webfs;
 
+  Node n1 ("name1",Node::Type::BRANCH);
+  Node n2 ("name2",Node::Type::BRANCH);
+
+  EXPECT_FALSE(n1==n2);
+  EXPECT_TRUE(n1!=n2);
+}
+
+TEST(NodeEqualTest, NodeWithDifferentTypeAreDifferent) {
+  using namespace webfs;
+
+  Node n1 ("name1",Node::Type::LEAF);
+  Node n2 ("name1",Node::Type::BRANCH);
+
+  EXPECT_FALSE(n1==n2);
+  EXPECT_TRUE(n1!=n2);
+}
+
+TEST(NodeEqualTest, NodeWithDifferentChildAreDifferent) {
+  using namespace webfs;
+
+  Node r1 ("name1",Node::Type::BRANCH);
+  Node c1 ("childName1",Node::Type::LEAF);
+  r1.addChild(&c1);
+
+  Node r2 ("name1",Node::Type::BRANCH);
+  Node c2 ("childName2",Node::Type::LEAF);
+  r2.addChild(&c2);
+
+  EXPECT_FALSE(r1==r2);
+  EXPECT_TRUE(r1!=r2);
+}
+
+TEST(NodeEqualTest, NodeWithSameChildInDifferentObjectAreEqual) {
+  using namespace webfs;
+
+  Node r1 ("name1",Node::Type::BRANCH);
+  Node c1 ("childName1",Node::Type::LEAF);
+  r1.addChild(&c1);
+
+  Node r2 ("name1",Node::Type::BRANCH);
+  Node c2 ("childName1",Node::Type::LEAF);
+  r2.addChild(&c2);
+
+  EXPECT_TRUE(r1==r2);
+  EXPECT_FALSE(r1!=r2);
+}
 
 /*
 #include "gists/gistsRequest.h"
