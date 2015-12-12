@@ -61,3 +61,23 @@ Node *Node::findChild(const std::string &relativePath) {
       return nullptr;
     });
 }
+
+//rapidjson::Document& operator<<(rapidjson::Document &out,Node &node){
+void Node::write(rapidjson::Document& out){
+	using namespace rapidjson;
+	auto& allocator=out.GetAllocator();
+	Value isLeaf(type == Node::Type::LEAF);
+	out.AddMember("isLeaf",isLeaf,allocator);
+	Value nodeName;
+	nodeName.SetString(name.c_str(),name.size(),allocator);
+	out.AddMember("name",nodeName,allocator);
+	if(type==Node::Type::BRANCH){
+		Value jsonChild(kArrayType);
+		for(Node *child : children){
+			child->write(out);
+			//jsonChild.PushBack(out,allocator);
+		}
+		out.AddMember("Children",jsonChild,allocator);
+	}
+}
+

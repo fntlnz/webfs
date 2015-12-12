@@ -5,8 +5,10 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/document.h"
 #include "utils.h"
 #include "file.h"
+
 
 #ifndef WEBFS_NODE_H_
 #define WEBFS_NODE_H_
@@ -52,14 +54,49 @@ class Node {
     }
 
     File *file;
+
+  template<typename Writer>
+  void serialize(Writer &out)const{
+	  out.StartObject();
+	  out.String("isLeaf");
+	  out.Bool(type==Type::LEAF);
+	  out.String("name");
+	  out.String(name.c_str(),name.length(),true);
+	  out.String("id");
+	  out.String(remoteId.c_str(),remoteId.length(),true);
+
+	  if(type==Type::BRANCH){
+		  out.String("children");
+		  out.StartArray();
+		  for(Node *n : children){
+			  n->serialize(out);
+		  }
+		  out.EndArray();
+	  }
+
+	  out.EndObject();
+  }
+
+  void setRemoteId(const std::string &id){
+	  remoteId=id;
+  }
+
+  void write(rapidjson::Document &doc);
+  //friend rapidjson::Document& operator<<(rapidjson::Document &out,Node &node);
+  //friend std::ostream& operator<<(std::ostream &out, const Node &node);
+
   private:
 
     Node* findInChildren(const std::string &currentName);
     std::string name;
+    std::string remoteId;
     Node *parent;
     const Type type;
     std::vector<Node *> children;
 }; //Node
+
+
+
 
 } // webfs namespace
 #endif // WEBFS_NODE_H_
