@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
 #include "utils.h"
 #include "file.h"
 
@@ -49,41 +49,43 @@ class Node {
       return type;
     }
 
-    const std::vector<Node*> getChildren(){
-      return children;
-    }
 
     File *file;
 
-  template<typename Writer>
-  void serialize(Writer &out)const{
-	  out.StartObject();
-	  out.String("isLeaf");
-	  out.Bool(type==Type::LEAF);
-	  out.String("name");
-	  out.String(name.c_str(),name.length(),true);
-	  out.String("id");
-	  out.String(remoteId.c_str(),remoteId.length(),true);
-
-	  if(type==Type::BRANCH){
-		  out.String("children");
-		  out.StartArray();
-		  for(Node *n : children){
-			  n->serialize(out);
-		  }
-		  out.EndArray();
-	  }
-
-	  out.EndObject();
+  const std::vector<Node*> getChildren()const{
+    return children;
   }
+
+  /**
+   * write the in a json format
+   * @param out object where write the node
+   */
+  template<typename BufferType>
+  void writeTo(rapidjson::Writer<BufferType> &out) const{
+    out.StartObject();
+	out.String("isLeaf");
+	const bool isLeaf= type==Type::LEAF;
+	out.Bool(isLeaf);
+	out.String("name");
+	out.String(name);
+	out.String("id");
+	out.String(remoteId);
+
+	if(!isLeaf){
+	  out.String("children");
+	  out.StartArray();
+	  for(const Node * n : children)
+	    n->writeTo(out);
+	  out.EndArray();
+	}//if !isLeaf
+
+	out.EndObject();
+  }//writeTo
 
   void setRemoteId(const std::string &id){
 	  remoteId=id;
   }
 
-  void write(rapidjson::Document &doc);
-  //friend rapidjson::Document& operator<<(rapidjson::Document &out,Node &node);
-  //friend std::ostream& operator<<(std::ostream &out, const Node &node);
 
   private:
 
