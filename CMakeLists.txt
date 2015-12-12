@@ -10,9 +10,16 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
+
 set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 
+#commin dependency between the project and the test
+include(DownloadRapidJSON)
+
+#libwebfs sources
 add_subdirectory(src)
+#fuse source
 add_subdirectory(fuse EXCLUDE_FROM_ALL)
 
 enable_testing()
