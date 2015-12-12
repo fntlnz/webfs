@@ -4,6 +4,27 @@
 
 using namespace webfs;
 
+static inline Node::Type extractType(const rapidjson::Value &jsonNode){
+  if(jsonNode["isLeaf"].GetBool())
+    return Node::Type::LEAF;
+  else
+    return Node::Type::BRANCH;
+}
+
+Node::Node(const rapidjson::Value &jsonNode):name(jsonNode["name"].GetString()),
+		parent(nullptr),type(extractType(jsonNode)){
+  using namespace rapidjson;
+
+  if(jsonNode.HasMember("children")){
+    const rapidjson::Value &childrenJson = jsonNode["children"];
+	if(childrenJson.Size()!=0){
+	  children.reserve(childrenJson.Size());
+	  for(decltype(childrenJson.Size()) i=0;i<childrenJson.Size();i++)
+	    addChild(new Node(childrenJson[i]));
+	}//if !=0
+  }//if
+}
+
 Node *Node::findInChildren(const std::string &currentName) {
   for (auto &node : children) {
     if (node->name == currentName) {

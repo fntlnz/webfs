@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "utils.h"
 #include "file.h"
@@ -25,13 +26,23 @@ class Node {
       LEAF,
     };
 
-    Node(const std::string &n,const Type t):
-      name(n),parent(nullptr),type(t){}
+  Node(const std::string &n,const Type t):
+    name(n),parent(nullptr),type(t){}
+
+
+  explicit Node(const rapidjson::Value &jsonNode);
 
     /**
      * Add a child to the current Node
      */
     void addChild(Node *child);
+
+  /**
+   * Add a child to the current Node
+   */
+   //TODO how we handle the pointer? who have to free it?
+   //ad a function create Child and do the allocation inside the class?
+  void addChild(Node *child);
 
     /**
      * Find the node at the provided relativePath (relative to the current node)
@@ -86,15 +97,37 @@ class Node {
 	  remoteId=id;
   }
 
+  bool operator==(const Node &other)const {
+    bool nodeAreEqual = (name==other.name &&
+	  type == other.type &&
+	  children.size()==other.children.size());
+
+    if(!nodeAreEqual){
+      return false;
+    }
+
+    //else check the child
+    for(auto i=0u; i< children.size();i++){
+      if((*children[i])!=(*other.children[i]))
+	    return false;
+    }//for
+    //all the children are equal
+    return true;
+  }
+
+  bool operator!=(const Node &other) const{
+    return !(*this == other);
+  }
 
   private:
 
     Node* findInChildren(const std::string &currentName);
     std::string name;
-    std::string remoteId;
     Node *parent;
     const Type type;
     std::vector<Node *> children;
+
+    std::string remoteId;
 }; //Node
 
 
