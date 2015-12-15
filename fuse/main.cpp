@@ -70,7 +70,9 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
 }
 
 static int write_callback(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
-  return 0;
+
+  std::string p = std::string(path);
+  return filesystem->writeChunk(p, buf, size, offset);
 }
 
 static int truncate_callback(const char *path, off_t offset) {
