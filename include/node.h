@@ -8,6 +8,7 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "utils.h"
+#include "file.h"
 
 
 #ifndef WEBFS_NODE_H_
@@ -31,28 +32,36 @@ class Node {
 
   explicit Node(const rapidjson::Value &jsonNode);
 
+<<<<<<< HEAD
   /**
    * Add a child to the current Node
    */
    //TODO how we handle the pointer? who have to free it?
    //ad a function create Child and do the allocation inside the class?
   void addChild(Node *child);
+=======
+    /**
+     * Add a child to the current Node
+     */
+    void addChild(Node *child);
+>>>>>>> 6b04e8a425fb0eb0c8d2b7d85eb2e8305512190d
 
-  /**
-   * Find the node at the provided relativePath (relative to the current node)
-   * starting from the current Node.
-   */
-  Node *findChild(const std::string &relativePath);
+    /**
+     * Find the node at the provided relativePath (relative to the current node)
+     * starting from the current Node.
+     */
+    Node *findChild(const std::string &relativePath);
 
-  Node *findParent(const std::string &relativePath);
+    Node *findParent(const std::string &relativePath);
 
-  const std::string& getName()const{
-    return name;
-  }
+    const std::string& getName()const{
+      return name;
+    }
 
-  const Type& getType()const {
-    return type;
-  }
+    const Type& getType()const {
+      return type;
+    }
+
 
   const std::vector<Node*> getChildren()const{
     return children;
@@ -110,10 +119,12 @@ class Node {
     return !(*this == other);
   }
 
+
+  File *file;
+
   private:
 
     Node* findInChildren(const std::string &currentName);
-
     std::string name;
     Node *parent;
     const Type type;
