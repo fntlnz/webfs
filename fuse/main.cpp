@@ -1,5 +1,6 @@
 #include "node.h"
 #include "filesystem.h"
+
 #include <iostream>
 
 #define FUSE_USE_VERSION 26
@@ -139,11 +140,13 @@ static fuse_operations init_fuse_operations() {
 } // extern "C"
 
 int main(int argc, char *argv[]) {
+
   auto root = new webfs::Node("",webfs::Node::Type::BRANCH);
   auto folder = new webfs::Node("folder",webfs::Node::Type::BRANCH);
   root->addChild(folder);
 
   filesystem = new webfs::Filesystem(root);
+  filesystem->storage = new webfs::storage::Gist();
 
   fuse_operations ops = init_fuse_operations();
   return fuse_main(argc, argv, &ops, NULL);

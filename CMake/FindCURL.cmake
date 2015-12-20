@@ -11,9 +11,6 @@ FIND_PATH(CURL_INCLUDE_DIR curl/curl.h
         "$ENV{LIB_DIR}/include"
         /usr/local/include
         /usr/include
-        #mingw
-        c:/msys/local/include
-        NO_DEFAULT_PATH
         )
 
 MARK_AS_ADVANCED(CURL_INCLUDE_DIR)
