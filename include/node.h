@@ -29,9 +29,7 @@ class Node {
   Node(const std::string &n,const Type t):
     name(n),parent(nullptr),type(t){}
 
-
   explicit Node(const rapidjson::Value &jsonNode);
-
 
   /**
    * Add a child to the current Node
@@ -55,9 +53,6 @@ class Node {
   const Type& getType()const {
     return type;
   }
-
-
-  File *file;
 
   const std::vector<Node*> getChildren()const{
     return children;
@@ -115,6 +110,7 @@ class Node {
     return !(*this == other);
   }
 
+  File *file;
   private:
 
     Node* findInChildren(const std::string &currentName);
