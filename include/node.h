@@ -32,10 +32,6 @@ class Node {
 
   explicit Node(const rapidjson::Value &jsonNode);
 
-    /**
-     * Add a child to the current Node
-     */
-    void addChild(Node *child);
 
   /**
    * Add a child to the current Node
@@ -44,24 +40,24 @@ class Node {
    //ad a function create Child and do the allocation inside the class?
   void addChild(Node *child);
 
-    /**
-     * Find the node at the provided relativePath (relative to the current node)
-     * starting from the current Node.
-     */
-    Node *findChild(const std::string &relativePath);
+  /**
+  * Find the node at the provided relativePath (relative to the current node)
+  * starting from the current Node.
+  */
+  Node *findChild(const std::string &relativePath);
 
-    Node *findParent(const std::string &relativePath);
+  Node *findParent(const std::string &relativePath);
 
-    const std::string& getName()const{
-      return name;
-    }
+  const std::string& getName()const{
+    return name;
+  }
 
-    const Type& getType()const {
-      return type;
-    }
+  const Type& getType()const {
+    return type;
+  }
 
 
-    File *file;
+  File *file;
 
   const std::vector<Node*> getChildren()const{
     return children;
