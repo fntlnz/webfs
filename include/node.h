@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
 #include "utils.h"
 #include "file.h"
 
@@ -27,8 +25,6 @@ class Node {
 
   Node(const std::string &n,const Type t):
     name(n),parent(nullptr),type(t){}
-
-  explicit Node(const rapidjson::Value &jsonNode);
 
   /**
    * Add a child to the current Node
@@ -88,32 +84,6 @@ class Node {
     const Type type;
     std::vector<Node *> children;
 }; //Node
-
-class NodeSerializer {
-  public:
-    template<typename BufferType>
-    static void serialize(const Node *node, rapidjson::Writer<BufferType> &out) {
-      out.StartObject();
-      out.String("isLeaf");
-      const bool isLeaf= node->getType() == Node::Type::LEAF;
-      out.Bool(isLeaf);
-      out.String("name");
-      out.String(node->getName());
-
-      if(!isLeaf){
-        out.String("children");
-        out.StartArray();
-        for(const Node *n : node->getChildren()) {
-          NodeSerializer::serialize(n, out);
-        }
-        out.EndArray();
-      }//if !isLeaf
-
-      out.EndObject();
-    }
-};
-
-
 
 } // webfs namespace
 #endif // WEBFS_NODE_H_

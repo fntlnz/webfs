@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "node.h"
+#include "node_serializer.h"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 
@@ -47,8 +48,8 @@ TEST_F(NodeTestDumpJson, writeLeafNode) {
 
   checkHasAllField(readNode);
 
-  Node rebuildNode(readNode);
-  EXPECT_EQ(root,rebuildNode);
+  Node *rebuiltNode = NodeSerializer::unserialize(readNode);
+  EXPECT_EQ(root, *rebuiltNode);
 }
 
 TEST_F(NodeTestDumpJson, writeBranchNode) {
@@ -72,7 +73,8 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
   readNode.Parse(buffer.GetString());
 
   checkHasAllField(readNode);
-
-  Node rebuildNode(readNode);
-  EXPECT_EQ(root,rebuildNode);
+  
+  Node *rebuiltNode = NodeSerializer::unserialize(readNode);
+  EXPECT_EQ(root, *rebuiltNode);
 }
+
