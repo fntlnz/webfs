@@ -16,7 +16,7 @@ set(VENDOR_DIR ${PROJECT_SOURCE_DIR}/vendor)
 # common dependency between the project and the test
 include(DownloadRapidJSON)
 
-set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include ${VENDOR_DIR}/rapidjson/src/rapidjson/include)
+set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 
 # libwebfs sources
 add_subdirectory(src)
