@@ -10,21 +10,25 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+set(VENDOR_DIR ${PROJECT_SOURCE_DIR}/vendor)
 
 
-set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include)
-
-#commin dependency between the project and the test
+# common dependency between the project and the test
 include(DownloadRapidJSON)
 
-#libwebfs sources
+set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include ${VENDOR_DIR}/rapidjson/src/rapidjson/include)
+
+# libwebfs sources
 add_subdirectory(src)
-#fuse source
+
+# fuse sources
 add_subdirectory(fuse EXCLUDE_FROM_ALL)
 
 enable_testing()
 add_subdirectory(test)
-add_test(wlibebfstest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/libwebfstest)
+add_test(libwebfstest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/libwebfstest)
+
+# vcs-clean target
 add_custom_target(vcs-clean
         COMMAND find . -name "CMakeFiles" | xargs rm -rfv
         COMMAND find . -name "Makefile" | xargs rm -rfv

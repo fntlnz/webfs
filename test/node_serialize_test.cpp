@@ -10,28 +10,25 @@ public:
   rapidjson::GenericStringBuffer<rapidjson::UTF8<>> buffer;
   rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<>>>* writer;
 
-  virtual void SetUp(){
+  virtual void SetUp() {
     writer = new rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<>>>(buffer);
-   }
+  }
 
-  virtual void TearDown(){
+  virtual void TearDown() {
     delete writer;
   }
 
-  void checkHasAllField(const rapidjson::Value &jsonNode){
-	EXPECT_TRUE(jsonNode.HasMember("isLeaf"));
-	EXPECT_TRUE(jsonNode.HasMember("name"));
-	if(!jsonNode["isLeaf"].GetBool()){
-	  EXPECT_TRUE(jsonNode.HasMember("children"));
-	  const rapidjson::Value &childrenJson = jsonNode["children"];
-	  EXPECT_TRUE(childrenJson.IsArray());
-	  for(decltype(childrenJson.Size()) i=0; i<childrenJson.Size();i++)
-		  checkHasAllField(childrenJson[i]);
-	}//if
-  }//isSameNode
-
-protected:
-
+  void checkHasAllField(const rapidjson::Value &jsonNode) {
+    EXPECT_TRUE(jsonNode.HasMember("isLeaf"));
+    EXPECT_TRUE(jsonNode.HasMember("name"));
+    if(!jsonNode["isLeaf"].GetBool()){
+      EXPECT_TRUE(jsonNode.HasMember("children"));
+      const rapidjson::Value &childrenJson = jsonNode["children"];
+      EXPECT_TRUE(childrenJson.IsArray());
+      for(decltype(childrenJson.Size()) i=0; i<childrenJson.Size();i++)
+        checkHasAllField(childrenJson[i]);
+    }// if
+  }// isSameNode
 };
 
 TEST_F(NodeTestDumpJson, writeLeafNode) {
@@ -41,7 +38,7 @@ TEST_F(NodeTestDumpJson, writeLeafNode) {
   const std::string nodeName("writeMe");
   Node root (nodeName,Node::Type::LEAF);
 
-  root.writeTo(*writer);
+  NodeSerializer::serialize(&root, *writer);
 
   //std::cout<<buffer.GetString()<<std::endl;
 
@@ -67,7 +64,7 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
   root.addChild(&dir1);
   dir1.addChild(&dir1c1);
 
-  root.writeTo(*writer);
+  NodeSerializer::serialize(&root, *writer);
 
   //std::cout<<buffer.GetString()<<std::endl;
 
@@ -78,8 +75,4 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
 
   Node rebuildNode(readNode);
   EXPECT_EQ(root,rebuildNode);
-
 }
-
-
-

@@ -116,23 +116,3 @@ TEST(NodeEqualTest, NodeWithSameChildInDifferentObjectAreEqual) {
   EXPECT_FALSE(r1!=r2);
 }
 
-/*
-#include "gists/gistsRequest.h"
-
-TEST(NodeTest, createRequest) {
-  using namespace rapidjson;
-  using namespace webfs;
-
-  Node root ("writeMe",Node::Type::BRANCH);
-
-  gists::create(&root);
-
-  GenericStringBuffer<UTF8<>> buffer;
-    Writer<GenericStringBuffer<UTF8<>>> writer(buffer);
-
-    root.serialize(writer);
-
-    std::cout<<buffer.GetString()<<std::endl;
-
-}
-*/
