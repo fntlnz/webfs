@@ -61,3 +61,4 @@ Node *Node::findChild(const std::string &relativePath) {
       return nullptr;
     });
 }
+
