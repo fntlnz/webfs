@@ -8,37 +8,43 @@
 
 namespace webfs {
 
-static inline Node::Type extractType(const rapidjson::Value &jsonNode){
-  if(jsonNode["isLeaf"].GetBool())
-    return Node::Type::LEAF;
-  else
-    return Node::Type::BRANCH;
-}
-
 class NodeSerializer {
   public:
     template<typename BufferType>
-    static void serialize(const Node *node, rapidjson::Writer<BufferType> &out) {
+    static void serialize(const Node &node, rapidjson::Writer<BufferType> &out) {
       out.StartObject();
-      out.String("isLeaf");
-      const bool isLeaf= node->getType() == Node::Type::LEAF;
+      out.String(IS_LEAF_TAG);
+      const bool isLeaf= node.getType() == Node::Type::LEAF;
       out.Bool(isLeaf);
-      out.String("name");
-      out.String(node->getName());
+      out.String(NAME_TAG);
+      out.String(node.getName());
 
       if(!isLeaf){
-        out.String("children");
+        out.String(CHILDREN_TAG);
         out.StartArray();
-        for(const Node *n : node->getChildren()) {
-          NodeSerializer::serialize(n, out);
+        for(const Node *n : node.getChildren()) {
+          NodeSerializer::serialize(*n, out);
         }
         out.EndArray();
       }//if !isLeaf
 
       out.EndObject();
-    }
+    }//serialize
 
     static Node *unserialize(const rapidjson::Value &jsonNode);
+
+  private:
+
+    static inline Node::Type extractType(const rapidjson::Value &jsonNode){
+      if(jsonNode[IS_LEAF_TAG].GetBool())
+        return Node::Type::LEAF;
+      else
+        return Node::Type::BRANCH;
+    }
+
+    const static std::string NAME_TAG;
+    const static std::string IS_LEAF_TAG;
+    const static std::string CHILDREN_TAG;
 };
 } // webfs namespace
 #endif // WEBFS_NODE_SERIALIZER_H_

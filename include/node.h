@@ -37,8 +37,9 @@ class Node {
   * Find the node at the provided relativePath (relative to the current node)
   * starting from the current Node.
   */
+  //TODO return a const reference?
   Node *findChild(const std::string &relativePath);
-
+  //TODO return a const reference?
   Node *findParent(const std::string &relativePath);
 
   const std::string& getName()const{

@@ -39,7 +39,7 @@ TEST_F(NodeTestDumpJson, writeLeafNode) {
   const std::string nodeName("writeMe");
   Node root (nodeName,Node::Type::LEAF);
 
-  NodeSerializer::serialize(&root, *writer);
+  NodeSerializer::serialize(root, *writer);
 
   //std::cout<<buffer.GetString()<<std::endl;
 
@@ -65,7 +65,7 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
   root.addChild(&dir1);
   dir1.addChild(&dir1c1);
 
-  NodeSerializer::serialize(&root, *writer);
+  NodeSerializer::serialize(root, *writer);
 
   //std::cout<<buffer.GetString()<<std::endl;
 
