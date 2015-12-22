@@ -1,5 +1,6 @@
 #include "node.h"
 #include "filesystem.h"
+#include "node_serializer.h"
 
 #include <iostream>
 
@@ -141,9 +142,11 @@ static fuse_operations init_fuse_operations() {
 
 int main(int argc, char *argv[]) {
 
-  auto root = new webfs::Node("",webfs::Node::Type::BRANCH);
-  auto folder = new webfs::Node("folder",webfs::Node::Type::BRANCH);
-  root->addChild(folder);
+  std::string json = "{\"isLeaf\":false,\"name\":\"\",\"children\":[{\"isLeaf\":false,\"name\":\"I AM A DEFAULT FOLDER\",\"children\":[]}]}";
+  rapidjson::Document readNode;
+  readNode.Parse(json.c_str());
+
+  auto root = webfs::NodeSerializer::unserialize(readNode);
 
   filesystem = new webfs::Filesystem(root);
   filesystem->storage = new webfs::storage::Gist();
