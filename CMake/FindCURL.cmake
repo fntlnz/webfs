@@ -21,6 +21,7 @@ FIND_LIBRARY(CURL_LIBRARY NAMES curl libcurl_imp PATHS
         "$ENV{LIB_DIR}/lib"
         /usr/local/lib
         /usr/lib
+        /usr/lib/x86_64-linux-gnu
         NO_DEFAULT_PATH
         )
 

@@ -1,0 +1,40 @@
+env: linux
+#install more recent compileter + curl and fuse dev package
+addons:
+    apt:
+        sources:
+            - llvm-toolchain-precise-3.7
+            - ubuntu-toolchain-r-test
+        packages:
+            - clang-3.7
+            - g++-5
+            - gcc-5
+            - libcurl-dev
+            - libcurl4-openssl-dev
+            - libfuse-dev
+
+language: cpp
+
+compiler:
+  - clang
+  - gcc
+#install more recent cmake version
+before_install:
+  - wget https://cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz --no-check-certificate -O cmake.tar.gz;
+  - tar xf cmake.tar.gz
+
+#overwrite the compiler and the cmake to use
+install:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
+  - export CMAKE=$(readlink -f "cmake-3.3.2-Linux-x86_64/bin/cmake");
+  - export CTEST=$(readlink -f "cmake-3.3.2-Linux-x86_64/bin/ctest");
+
+before_script:
+  - $CXX --version
+  - $CMAKE .
+
+script: 
+  - make
+  - $CTEST
+
