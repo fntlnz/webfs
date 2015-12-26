@@ -1,15 +1,37 @@
+#include <memory>
+#include <curl/curl.h>
 #include "storage.h"
-#include <iostream>
+
 #ifndef WEBFS_STORAGE_GIST_H_
 #define WEBFS_STORAGE_GIST_H_
+
 namespace webfs {
 namespace storage {
+
 class Gist : public Storage {
   public:
-    std::string write(const std::string &buf) {
-      std::cout << "BUF: " << buf << std::endl;
-      return "somereference"; //TODO: return the right reference from gist
+	Gist();
+	Gist(const std::string &accessTocken);
+
+    std::string write(const std::vector<char> &buf) override;
+    std::vector<char> read(const std::string &remoteId) override;
+
+    virtual ~Gist(){
+    	curl_slist_free_all(httpReqHeaders);
     }
+
+  private:
+    struct pCURLDeleter {
+      void operator()(CURL * c) { curl_easy_cleanup(c); }
+    };
+
+    using pCURL = std::unique_ptr<CURL,pCURLDeleter>;
+
+    pCURL getBaseRemoteRequest(const char* url=nullptr);
+    void setHttpRequestHeader();
+    void checkValidResponse(const CURLcode req,const pCURL &curl);
+    struct curl_slist *httpReqHeaders;
+
 };
 }
 }
