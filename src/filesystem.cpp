@@ -38,7 +38,7 @@ int Filesystem::writeChunk(const std::string &path, const char *buf, size_t size
   // TODO: write the buffer somewhere, the idea is to move all chunks to a
   // local cache and then write to the remote storage N chunks togheter in order
   // to minimize calls to remote systems.
-  auto buffer = std::string(buf);
+  auto buffer = std::vector<char>(buf+offset,buf+offset+size);
   std::string chunkReference = storage->write(buffer);
 
   //TODO: the chunk reference must be saved to an internal database in order to
