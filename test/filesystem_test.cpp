@@ -23,7 +23,7 @@ TEST(FilesystemTest, TestCreateFile) {
 
   auto createdFile = fs.createFile("/dummyfile.txt");
 
-  auto createdFile2 = fs.createFile("/dummyfile.txt");
+  fs.createFile("/dummyfile.txt");
 
   auto foundCreatedFile = root.findChild("dummyfile.txt");
 

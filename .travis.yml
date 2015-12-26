@@ -14,10 +14,14 @@ addons:
             - libfuse-dev
 
 language: cpp
+env:
+  - BUILD_TYPE=Debug
+  - BUILD_TYPE=Release
 
 compiler:
   - clang
   - gcc
+
 #install more recent cmake version
 before_install:
   - wget https://cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz --no-check-certificate -O cmake.tar.gz;
@@ -29,12 +33,13 @@ install:
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
   - export CMAKE=$(readlink -f "cmake-3.3.2-Linux-x86_64/bin/cmake");
   - export CTEST=$(readlink -f "cmake-3.3.2-Linux-x86_64/bin/ctest");
+  - if [ "$BUILD_TYPE" == "Debug" ]; then export CXX_FLAGS="${CXX_FLAGS} -Werror"; fi
 
 before_script:
-  - $CXX --version
-  - $CMAKE .
+  - $CMAKE -DCMAKE_BUILD_TYPE=$BUILD_TYPE .
 
 script: 
   - make
   - $CTEST
+
 
