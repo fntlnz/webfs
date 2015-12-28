@@ -72,6 +72,8 @@ CURLcode curl_easy_setopt(CURL *curl, CURLoption option,...){
     write_callback=va_arg(arg,size_t(*)(const char *, size_t, size_t, void *));
   else if(option==CURLOPT_WRITEDATA)
     userData = va_arg(arg,void*);
+  else if(option == CURLOPT_HTTPAUTH)
+	reqOption.emplace(option,std::to_string(va_arg(arg,int)));
   else if(option != CURLOPT_HTTPHEADER)
     reqOption.emplace(option,va_arg(arg,char*));
   return CURLE_OK;

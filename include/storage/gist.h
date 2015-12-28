@@ -53,16 +53,6 @@ private:
   void setHttpRequestHeader();
 
   /**
-   * check it the request was done correctly
-   * @param req curl return code
-   * @param curl pointer to the call to check
-   * @param validHttpRensponse required http response status
-   * @throw system_error if some error happen
-   */
-  void checkValidResponse(const CURLcode req, const CurlUtil::pCURL &curl,
-      const long validHttpRensponse);
-
-  /**
    * list of http header to append to each request
    */
   struct curl_slist *httpReqHeaders;

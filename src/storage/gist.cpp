@@ -12,9 +12,10 @@
 using namespace webfs::storage;
 using pCURL=CurlUtil::pCURL;
 using rapidjson::Document;
-using std::system_error;
+
 using std::string;
 using std::vector;
+using std::system_error;
 
 #define GIST_API_URL "https://api.github.com/gists"
 
@@ -47,17 +48,6 @@ pCURL Gist::getBaseRemoteRequest(const std::string &url) {
   return pCURL(curl);
 }
 
-void Gist::checkValidResponse(const CURLcode req, const pCURL &curl,
-    const long validHttpCode) {
-  if (req != CURLE_OK)
-    throw system_error(req, std::system_category(), "Connection Error");
-  //else
-  long httpCode = 0;
-  curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, &httpCode);
-  if (httpCode != validHttpCode)
-    throw system_error(httpCode, std::system_category(),
-      "Invalud http response code");
-}
 
 //TODO use span instead of vector? -> is not copied so is ok vector..
 std::string Gist::write(const std::vector<char> &buf) {
@@ -78,7 +68,7 @@ std::string Gist::write(const std::vector<char> &buf) {
   std::string respData;
   CURLcode respCode;
   std::tie(respCode, respData) = CurlUtil::sendRequest(curl);
-  checkValidResponse(respCode, curl, 201);
+  CurlUtil::checkValidResponse(respCode, curl, 201);
 
   rapidjson::Document resp;
 
@@ -103,7 +93,7 @@ std::vector<char> Gist::read(const std::string &remoteId) {
   std::string respData;
 
   std::tie(respCode, respData) = CurlUtil::sendRequest(curl);
-  checkValidResponse(respCode, curl, 200);
+  CurlUtil::checkValidResponse(respCode, curl, 200);
 
   Document respDoc;
   respDoc.Parse(respData.c_str());
