@@ -45,5 +45,5 @@ TEST_F(TestGist, checkHeaderContnetWithAuth) {
   EXPECT_TRUE(curlMock_headerHasString("cache-control: no-cache"));
   EXPECT_TRUE(curlMock_headerHasString("User-Agent: webFS"));
   EXPECT_TRUE(curlMock_headerHasString("Content-Type: application/json"));
-  EXPECT_TRUE(curlMock_headerHasString(token));
+  EXPECT_TRUE(curlMock_headerHasString("Authorization: token "+token));
 }

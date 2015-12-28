@@ -34,7 +34,7 @@ Gist::Gist(const string &accessTocken) :
     Gist() {
   string temp("Authorization: token ");
   temp.append(accessTocken);
-  httpReqHeaders = curl_slist_append(httpReqHeaders, accessTocken.c_str());
+  httpReqHeaders = curl_slist_append(httpReqHeaders, temp.c_str());
 }
 
 pCURL Gist::getBaseRemoteRequest(const std::string &url) {
