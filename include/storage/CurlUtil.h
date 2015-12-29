@@ -53,19 +53,22 @@ public:
    * check it the request was done correctly
    * @param req curl return code
    * @param curl pointer to the call to check
-   * @param validHttpRensponse required http response status
+   * @param validHttpRensponse required http response status,
+   *  if negative the check will be skiped
    * @throw system_error if some error happen
    */
   static void checkValidResponse(const CURLcode req, const CurlUtil::pCURL &curl,
-	  const long validHttpRensponse){
+	  const long validHttpRensponse=-1){
 	if (req != CURLE_OK)
 	  throw std::system_error(req, std::system_category(), "Connection Error");
 	//else
-	long httpCode = 0;
-	curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, &httpCode);
-	if (httpCode != validHttpRensponse)
-	  throw std::system_error(httpCode, std::system_category(),
-		"Invalud http response code");
+	if(validHttpRensponse>0){
+	  long httpCode = 0;
+	  curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, &httpCode);
+	  if (httpCode != validHttpRensponse)
+	    throw std::system_error(httpCode, std::system_category(),
+		  "Invalud http response code");
+	}
   }
 
 private:

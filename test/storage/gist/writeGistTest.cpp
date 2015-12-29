@@ -1,4 +1,3 @@
-#include <algorithm>
 #include "gtest/gtest.h"
 #include "../../curlMock/curlMock.h"
 #include "storage/gist.h"
@@ -22,7 +21,6 @@ public:
 
 
 TEST_F(TestWriteGist, extractResponse) {
-  const std::string fakeRemoteId("1234567");
   webfs::storage::Gist gist;
 
   EXPECT_EQ(remoteId,gist.write(fileContent));
@@ -31,7 +29,4 @@ TEST_F(TestWriteGist, extractResponse) {
 
 
 }
-
-
-
 

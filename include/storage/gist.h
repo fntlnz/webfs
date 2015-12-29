@@ -34,6 +34,15 @@ public:
 
   std::vector<char> read(const std::string &remoteId) override;
 
+  /**
+   * if the gist belong to a user can be deleted
+   * @param remoteId gist to remove
+   * @return true if the operation can be done, false otherwise
+   */
+  bool remove(const std::string &remoteId);
+  std::string update(const std::string &remoteId,
+		  const std::vector<char> &newData);
+
   virtual ~Gist() {
     curl_slist_free_all(httpReqHeaders);
   }
@@ -42,10 +51,11 @@ private:
 
   /**
    * get a CURL request with the default parameters
-   * @param url url to request, or the default api url
+   * @param appendUrl string that will be append to the base api address,
+   * 	the / is included in the base api address
    * @return unique_ptr to a curl object
    */
-  CurlUtil::pCURL getBaseRemoteRequest(const std::string &url = { });
+  CurlUtil::pCURL getBaseRemoteRequest(const std::string &appendUrl = { });
 
   /**
    * append the default http header data
@@ -56,6 +66,7 @@ private:
    * list of http header to append to each request
    */
   struct curl_slist *httpReqHeaders;
+  bool withAuth;
 
 };
 
