@@ -21,11 +21,7 @@ class CurlUtil {
 			curl_easy_cleanup(c);
 		}
 	};
-	struct pCURLHeaderDeleter {
-		void operator()(struct curl_slist * p) {
-			curl_slist_free_all(p);
-		}
-	};
+
 public:
 
 	/**
@@ -52,24 +48,25 @@ public:
 
 	} //sendRequest
 
-	  /**
-	   * check it the request was done correctly
-	   * @param req curl return code
-	   * @param curl pointer to the call to check
-	   * @param validHttpRensponse required http response status
-	   * @throw system_error if some error happen
-	   */
-	  static void checkValidResponse(const CURLcode req, const CurlUtil::pCURL &curl,
-	      const long validHttpRensponse){
-	    if (req != CURLE_OK)
-		  throw std::system_error(req, std::system_category(), "Connection Error");
-		//else
-		long httpCode = 0;
-		curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, &httpCode);
-		if (httpCode != validHttpRensponse)
-		  throw std::system_error(httpCode, std::system_category(),
-		    "Invalud http response code");
-	  }
+
+  /**
+   * check it the request was done correctly
+   * @param req curl return code
+   * @param curl pointer to the call to check
+   * @param validHttpRensponse required http response status
+   * @throw system_error if some error happen
+   */
+  static void checkValidResponse(const CURLcode req, const CurlUtil::pCURL &curl,
+	  const long validHttpRensponse){
+	if (req != CURLE_OK)
+	  throw std::system_error(req, std::system_category(), "Connection Error");
+	//else
+	long httpCode = 0;
+	curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, &httpCode);
+	if (httpCode != validHttpRensponse)
+	  throw std::system_error(httpCode, std::system_category(),
+		"Invalud http response code");
+  }
 
 private:
 	/**

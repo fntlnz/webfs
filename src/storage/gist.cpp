@@ -13,9 +13,9 @@ using namespace webfs::storage;
 using pCURL=CurlUtil::pCURL;
 using rapidjson::Document;
 
+using std::system_error;
 using std::string;
 using std::vector;
-using std::system_error;
 
 #define GIST_API_URL "https://api.github.com/gists"
 
@@ -48,7 +48,6 @@ pCURL Gist::getBaseRemoteRequest(const std::string &url) {
   return pCURL(curl);
 }
 
-
 //TODO use span instead of vector? -> is not copied so is ok vector..
 std::string Gist::write(const std::vector<char> &buf) {
 
@@ -68,6 +67,7 @@ std::string Gist::write(const std::vector<char> &buf) {
   std::string respData;
   CURLcode respCode;
   std::tie(respCode, respData) = CurlUtil::sendRequest(curl);
+
   CurlUtil::checkValidResponse(respCode, curl, 201);
 
   rapidjson::Document resp;
@@ -93,6 +93,7 @@ std::vector<char> Gist::read(const std::string &remoteId) {
   std::string respData;
 
   std::tie(respCode, respData) = CurlUtil::sendRequest(curl);
+
   CurlUtil::checkValidResponse(respCode, curl, 200);
 
   Document respDoc;
