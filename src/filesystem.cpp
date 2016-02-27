@@ -3,21 +3,20 @@
 using namespace webfs;
 
 Node *Filesystem::createDirectory(const std::string &path) {
-  Node *parent = rootNode->findParent(path);
-
-  Node *curNode = new Node(
-      utils::explode(path, '/').back(),
-      Node::Type::BRANCH);
-  parent->addChild(curNode);
-  return curNode;
+	//TODO REMOVE ME
+	return createElement(path);
 }
 
 Node *Filesystem::createFile(const std::string &path) {
+	//TODO REMOVE ME
+  return createElement(path);
+}
+
+Node *Filesystem::createElement(const std::string &path) {
   Node *parent = rootNode->findParent(path);
 
   Node *curNode = new Node(
-      utils::explode(path, '/').back(),
-      Node::Type::LEAF);
+      utils::explode(path, '/').back());
   parent->addChild(curNode);
   return curNode;
 }
@@ -39,7 +38,6 @@ int Filesystem::writeChunk(const std::string &path, const char *buf, size_t size
   // local cache and then write to the remote storage N chunks togheter in order
   // to minimize calls to remote systems.
   auto buffer = std::vector<char>(buf+offset,buf+offset+size);
-  std::string chunkReference = storage->write(buffer);
 
   //TODO: the chunk reference must be saved to an internal database in order to
   //be used as chunk identifier
@@ -47,7 +45,7 @@ int Filesystem::writeChunk(const std::string &path, const char *buf, size_t size
   auto fileChunk = new FileChunk();
   fileChunk->size = size;
   fileChunk->offset = offset;
-  fileChunk->identifier = 1; // TODO: identifier based on used storage adapter + real location
+  fileChunk->identifier = storage->write(buffer);
   node->file->addChunk(fileChunk);
 
   return size;

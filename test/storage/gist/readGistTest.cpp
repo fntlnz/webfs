@@ -3,6 +3,8 @@
 #include "../../curlMock/curlMock.h"
 #include "storage/gist.h"
 
+#include "GistTestUtil.h"
+
 class TestReadGist : public ::testing::Test{
 
 public:
@@ -24,8 +26,9 @@ public:
 
 TEST_F(TestReadGist, extractResponse) {
   const std::string fakeRemoteId("1234567");
+  pStorageId remoteId = std::make_unique<TestStorageId>(fakeRemoteId);
   webfs::storage::Gist gist;
-  std::vector<char> data=gist.read(fakeRemoteId);
+  std::vector<char> data=gist.read(remoteId);
   EXPECT_TRUE(curlMock_getOptionValue(CURLOPT_URL).find(fakeRemoteId)
       !=std::string::npos);
   EXPECT_EQ(fileContent.size(),data.size());

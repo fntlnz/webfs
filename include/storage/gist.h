@@ -1,10 +1,12 @@
+#ifndef WEBFS_STORAGE_GIST_H_
+#define WEBFS_STORAGE_GIST_H_
+
+
 #include <memory>
 #include <curl/curl.h>
 #include "storage/storage.h"
 #include "storage/CurlUtil.h"
 
-#ifndef WEBFS_STORAGE_GIST_H_
-#define WEBFS_STORAGE_GIST_H_
 
 namespace webfs {
 namespace storage {
@@ -30,18 +32,18 @@ public:
    */
   Gist(const std::string &accessTocken);
 
-  std::string write(const std::vector<char> &buf) override;
+  Storage::pStorageId write(const std::vector<char> &buf) override;
 
-  std::vector<char> read(const std::string &remoteId) override;
+  std::vector<char> read(const Storage::pStorageId &remoteId) override;
 
   /**
    * if the gist belong to a user can be deleted
    * @param remoteId gist to remove
    * @return true if the operation can be done, false otherwise
    */
-  bool remove(const std::string &remoteId);
-  std::string update(const std::string &remoteId,
-		  const std::vector<char> &newData);
+  bool remove(const Storage::pStorageId &remoteId) override;
+  Storage::pStorageId update(const Storage::pStorageId &remoteId,
+		  const std::vector<char> &newData) override;
 
   virtual ~Gist() {
     curl_slist_free_all(httpReqHeaders);

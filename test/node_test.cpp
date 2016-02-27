@@ -4,9 +4,9 @@
 TEST(NodeTest, TestAddChild) {
   using namespace webfs;
 
-  Node root("",Node::Type::BRANCH);
+  Node root("");
 
-  Node child("file.txt",Node::Type::LEAF);
+  Node child("file.txt");
 
   root.addChild(&child);
 
@@ -18,8 +18,8 @@ TEST(NodeTest, TestAddChild) {
 TEST(NodeTest, TestFindParent) {
   using namespace webfs;
 
-  Node root("",Node::Type::BRANCH);
-  Node folder( "folder",Node::Type::BRANCH);
+  Node root("");
+  Node folder( "folder");
 
   root.addChild(&folder);
 
@@ -38,15 +38,15 @@ TEST(NodeTest, TestFindParent) {
 TEST(NodeTest, TestFindChild) {
   using namespace webfs;
 
-  Node root ("",Node::Type::BRANCH);
+  Node root ("");
 
-  Node folder("folder",Node::Type::BRANCH);
+  Node folder("folder");
 
-  Node folder2("folder2", Node::Type::BRANCH);
+  Node folder2("folder2");
 
-  Node subfolder("subfolder",Node::Type::BRANCH);
+  Node subfolder("subfolder");
 
-  Node file("myawesome.txt",Node::Type::LEAF);
+  Node file("myawesome.txt");
 
   subfolder.addChild(&file);
   folder.addChild(&subfolder);
@@ -69,8 +69,8 @@ TEST(NodeTest, TestFindChild) {
 TEST(NodeEqualTest, NodeWithDifferentNameAreDifferent) {
   using namespace webfs;
 
-  Node n1 ("name1",Node::Type::BRANCH);
-  Node n2 ("name2",Node::Type::BRANCH);
+  Node n1 ("name1");
+  Node n2 ("name2");
 
   EXPECT_FALSE(n1==n2);
   EXPECT_TRUE(n1!=n2);
@@ -79,8 +79,9 @@ TEST(NodeEqualTest, NodeWithDifferentNameAreDifferent) {
 TEST(NodeEqualTest, NodeWithDifferentTypeAreDifferent) {
   using namespace webfs;
 
-  Node n1 ("name1",Node::Type::LEAF);
-  Node n2 ("name1",Node::Type::BRANCH);
+  Node n1 ("name1");
+  n1.addChild(new Node("Child"));
+  Node n2 ("name1");
 
   EXPECT_FALSE(n1==n2);
   EXPECT_TRUE(n1!=n2);
@@ -89,12 +90,12 @@ TEST(NodeEqualTest, NodeWithDifferentTypeAreDifferent) {
 TEST(NodeEqualTest, NodeWithDifferentChildAreDifferent) {
   using namespace webfs;
 
-  Node r1 ("name1",Node::Type::BRANCH);
-  Node c1 ("childName1",Node::Type::LEAF);
+  Node r1 ("name1");
+  Node c1 ("childName1");
   r1.addChild(&c1);
 
-  Node r2 ("name1",Node::Type::BRANCH);
-  Node c2 ("childName2",Node::Type::LEAF);
+  Node r2 ("name1");
+  Node c2 ("childName2");
   r2.addChild(&c2);
 
   EXPECT_FALSE(r1==r2);
@@ -104,12 +105,12 @@ TEST(NodeEqualTest, NodeWithDifferentChildAreDifferent) {
 TEST(NodeEqualTest, NodeWithSameChildInDifferentObjectAreEqual) {
   using namespace webfs;
 
-  Node r1 ("name1",Node::Type::BRANCH);
-  Node c1 ("childName1",Node::Type::LEAF);
+  Node r1 ("name1");
+  Node c1 ("childName1");
   r1.addChild(&c1);
 
-  Node r2 ("name1",Node::Type::BRANCH);
-  Node c2 ("childName1",Node::Type::LEAF);
+  Node r2 ("name1");
+  Node c2 ("childName1");
   r2.addChild(&c2);
 
   EXPECT_TRUE(r1==r2);

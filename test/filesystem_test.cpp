@@ -4,7 +4,7 @@
 TEST(FilesystemTest, TestCreateDirectory) {
   using namespace webfs;
 
-  Node root("", Node::Type::BRANCH);
+  Node root("");
 
   Filesystem fs(&root);
 
@@ -13,11 +13,12 @@ TEST(FilesystemTest, TestCreateDirectory) {
   auto foundCreatedDirectory = root.findChild("mycreateddir");
 
   EXPECT_EQ(foundCreatedDirectory, createdDirectory);
+  delete createdDirectory;
 }
 
 TEST(FilesystemTest, TestCreateFile) {
   using namespace webfs;
-  Node root("", Node::Type::BRANCH);
+  Node root("");
 
   Filesystem fs(&root);
 

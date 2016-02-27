@@ -23,7 +23,9 @@ public:
 TEST_F(TestWriteGist, extractResponse) {
   webfs::storage::Gist gist;
 
-  EXPECT_EQ(remoteId,gist.write(fileContent));
+  auto idIt= gist.write(fileContent)->getRemoteReadUrl().rfind(remoteId);
+  EXPECT_TRUE(idIt!=std::string::npos);
+
 
   EXPECT_EQ("POST",curlMock_getOptionValue(CURLOPT_CUSTOMREQUEST));
 

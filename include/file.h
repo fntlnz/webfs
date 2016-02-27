@@ -1,15 +1,20 @@
+#ifndef WEBFS_FILE_H_
+#define WEBFS_FILE_H_
+
 #include <vector>
 #include <string>
 #include <cstdlib>
-#ifndef WEBFS_FILE_H_
-#define WEBFS_FILE_H_
+
+#include "storage/storage.h"
+
 namespace webfs {
+using pStorageId = storage::Storage::pStorageId;
 
 class FileChunk {
   public:
     size_t size;
     off_t offset;
-    std::string identifier;
+    pStorageId identifier;
 };
 
 class File {

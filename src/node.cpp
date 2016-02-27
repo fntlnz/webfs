@@ -22,7 +22,7 @@ Node *Node::findParent(const std::string &relativePath) {
   auto splittedPath = webfs::utils::explode(relativePath, '/');
   return std::accumulate(splittedPath.begin(), splittedPath.end(), this,
     [](Node *accumulator, std::string currentName) -> Node * {
-      if (accumulator->type == Type::BRANCH) {
+      if (accumulator->getType() == Type::BRANCH) {
         auto c = accumulator->findInChildren(currentName);
         if (c != nullptr) {
           return c;
@@ -44,14 +44,14 @@ Node *Node::findChild(const std::string &relativePath) {
       if (accumulator == nullptr) {
         return accumulator;
       }
-      if (accumulator->type == Type::LEAF) {
+      if (accumulator->getType() == Type::LEAF) {
         if (accumulator->name == currentName) {
           return accumulator;
         }
         return nullptr;
       }
 
-      if (accumulator->type == Type::BRANCH) {
+      if (accumulator->getType() == Type::BRANCH) {
         Node *c = accumulator->findInChildren( currentName);
         if (c != nullptr) {
           return c;

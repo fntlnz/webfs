@@ -2,15 +2,15 @@
  * \file node.h
  * \brief Definition of Node, NodeType and Node traversing functions
  */
+#ifndef WEBFS_NODE_H_
+#define WEBFS_NODE_H_
+
 #include <string>
 #include <vector>
 
 #include "utils.h"
 #include "file.h"
 
-
-#ifndef WEBFS_NODE_H_
-#define WEBFS_NODE_H_
 namespace webfs {
 
 /**
@@ -24,8 +24,8 @@ class Node {
       LEAF,
     };
 
-    Node(const std::string &n,const Type t):
-      name(n),parent(nullptr),type(t){}
+    Node(const std::string &n):
+      name(n),parent(nullptr){}
 
     /**
      * Add a child to the current Node
@@ -47,8 +47,8 @@ class Node {
       return name;
     }
 
-    const Type& getType()const {
-      return type;
+    const Type getType()const {
+      return children.size()==0 ? Type::LEAF : Type::BRANCH;
     }
 
     const std::vector<Node*> getChildren()const{
@@ -59,8 +59,7 @@ class Node {
      * Check if two nodes are equal comparing their properties and children
      */
     bool operator==(const Node &other)const {
-      bool nodeAreEqual = (name==other.name &&
-          type == other.type &&
+      bool nodeAreEqual = (name==other.name  &&
           children.size()==other.children.size());
 
       if(!nodeAreEqual){
@@ -88,7 +87,7 @@ class Node {
     Node* findInChildren(const std::string &currentName);
     std::string name;
     Node *parent;
-    const Type type;
+
     std::vector<Node *> children;
 }; //Node
 

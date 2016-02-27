@@ -16,8 +16,35 @@ using rapidjson::Document;
 using std::system_error;
 using std::string;
 using std::vector;
+using pStorageId = Storage::pStorageId;
 
 #define GIST_API_URL "https://api.github.com/gists"
+
+class StorageIdGist : public Storage::StorageId{
+
+	private:
+		std::string mId;
+
+	public:
+		StorageIdGist(const std::string &id):mId(id){}
+
+	protected:
+		std::string getRemoteWriteUrl() const override{
+			return ((GIST_API_URL"/")+mId);
+		}
+		std::string getRemoteReadUrl() const override{
+			return ((GIST_API_URL"/")+mId);
+		}
+		std::string getRemoteEditUrl() const override{
+			return ((GIST_API_URL"/")+mId);
+		};
+		std::string getRemoteRemoveUrl() const override{
+			return ((GIST_API_URL"/")+mId);
+		};
+
+		friend class Gist;
+
+	};
 
 //NOTE: curl_slist_append made a copy of the string parameter
 
@@ -42,27 +69,27 @@ Gist::Gist() :
 
 }
 
-Gist::Gist(const string &accessTocken) :
+Gist::Gist(const string &accessToken) :
     Gist(){
   withAuth=true;
   string temp("Authorization: token ");
-  temp.append(accessTocken);
+  temp.append(accessToken);
 
   httpReqHeaders = curl_slist_append(httpReqHeaders, temp.c_str());
 }
 
-pCURL Gist::getBaseRemoteRequest(const std::string &appendUrl) {
+pCURL Gist::getBaseRemoteRequest(const std::string &url) {
   CURL * curl = curl_easy_init();
-  if (appendUrl.empty())
+  if (url.empty())
     curl_easy_setopt(curl, CURLOPT_URL, GIST_API_URL);
   else
-    curl_easy_setopt(curl, CURLOPT_URL, ((GIST_API_URL"/")+appendUrl).c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, httpReqHeaders);
   return pCURL(curl);
 }
 
 //TODO use span instead of vector? -> is not copied so is ok vector..
-std::string Gist::write(const std::vector<char> &buf) {
+pStorageId Gist::write(const std::vector<char> &buf) {
 
   pCURL curl = getBaseRemoteRequest();
   curl_easy_setopt(curl.get(), CURLOPT_CUSTOMREQUEST, "POST");
@@ -81,16 +108,16 @@ std::string Gist::write(const std::vector<char> &buf) {
 
   resp.Parse(respData.c_str());
   if (resp.HasMember("id")) {
-    return resp["id"].GetString();
+	  return std::make_unique<StorageIdGist>(resp["id"].GetString());
   } else
     throw system_error(500, std::system_category(),
         "Error parsing the response");
 
 }
 
-std::vector<char> Gist::read(const std::string &remoteId) {
+std::vector<char> Gist::read(const pStorageId &remoteId) {
 
-  pCURL curl = getBaseRemoteRequest(remoteId);
+  pCURL curl = getBaseRemoteRequest(remoteId->getRemoteReadUrl());
 
   std::vector<char> readData;
   CURLcode respCode;
@@ -118,11 +145,11 @@ std::vector<char> Gist::read(const std::string &remoteId) {
   return readData;
 }
 
-bool Gist::remove(const std::string &remoteId){
+bool Gist::remove(const pStorageId &remoteId){
   if(!withAuth)
 	  return false;
 
-  pCURL curl = getBaseRemoteRequest(remoteId);
+  pCURL curl = getBaseRemoteRequest(remoteId->getRemoteRemoveUrl());
   curl_easy_setopt(curl.get(), CURLOPT_CUSTOMREQUEST, "DELETE");
 
   CURLcode respCode;
@@ -136,8 +163,8 @@ bool Gist::remove(const std::string &remoteId){
   return httpCode==204;
 }
 
-std::string Gist::update(const std::string &remoteId,const std::vector<char> &newData){
-  pCURL curl = getBaseRemoteRequest(remoteId);
+pStorageId Gist::update(const pStorageId &remoteId,const std::vector<char> &newData){
+  pCURL curl = getBaseRemoteRequest(remoteId->getRemoteEditUrl());
   curl_easy_setopt(curl.get(), CURLOPT_CUSTOMREQUEST, "PATCH");
 
   const std::string message = uploadFileRequest("WebFs",newData);
@@ -152,7 +179,8 @@ std::string Gist::update(const std::string &remoteId,const std::vector<char> &ne
   rapidjson::Document resp;
   resp.Parse(respData.c_str());
   if (resp.HasMember("id")) {
-	return resp["id"].GetString();
+	  //TODO check if ti change
+	  return std::make_unique<StorageIdGist>(resp["id"].GetString());
   } else
 	throw system_error(500, std::system_category(),
 		"Error parsing the response");

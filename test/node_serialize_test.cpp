@@ -20,9 +20,9 @@ public:
   }
 
   void checkHasAllField(const rapidjson::Value &jsonNode) {
-    EXPECT_TRUE(jsonNode.HasMember("isLeaf"));
+    //EXPECT_TRUE(jsonNode.HasMember("isLeaf"));
     EXPECT_TRUE(jsonNode.HasMember("name"));
-    if(!jsonNode["isLeaf"].GetBool()){
+    if(jsonNode.HasMember("children")){
       EXPECT_TRUE(jsonNode.HasMember("children"));
       const rapidjson::Value &childrenJson = jsonNode["children"];
       EXPECT_TRUE(childrenJson.IsArray());
@@ -37,7 +37,7 @@ TEST_F(NodeTestDumpJson, writeLeafNode) {
   using namespace webfs;
 
   const std::string nodeName("writeMe");
-  Node root (nodeName,Node::Type::LEAF);
+  Node root (nodeName);
 
   NodeSerializer::serialize(root, *writer);
 
@@ -50,16 +50,17 @@ TEST_F(NodeTestDumpJson, writeLeafNode) {
 
   Node *rebuiltNode = NodeSerializer::unserialize(readNode);
   EXPECT_EQ(root, *rebuiltNode);
+  delete rebuiltNode;
 }
 
 TEST_F(NodeTestDumpJson, writeBranchNode) {
   using namespace rapidjson;
   using namespace webfs;
 
-  Node root ("writeMe",Node::Type::BRANCH);
-  Node dir1 ("dir1",Node::Type::BRANCH);
-  Node dir1c1("childe1",Node::Type::LEAF);
-  Node c1 ("childe2",Node::Type::LEAF);
+  Node root ("writeMe");
+  Node dir1 ("dir1");
+  Node dir1c1("childe1");
+  Node c1 ("childe2");
 
   root.addChild(&c1);
   root.addChild(&dir1);

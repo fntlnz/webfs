@@ -8,7 +8,7 @@ const std::string NodeSerializer::CHILDREN_TAG("children");
 
 Node *NodeSerializer::unserialize(const rapidjson::Value &jsonNode) {
   using namespace rapidjson;
-  Node *root = new Node(jsonNode[NAME_TAG].GetString(), extractType(jsonNode));
+  Node *root = new Node(jsonNode[NAME_TAG].GetString());
 
   if(jsonNode.HasMember(CHILDREN_TAG)){
     const rapidjson::Value &childrenJson = jsonNode[CHILDREN_TAG];
