@@ -5,6 +5,7 @@
 #include <tuple>
 #include <system_error>
 #include <curl/curl.h>
+#include <iostream>
 
 namespace webfs {
 namespace storage {

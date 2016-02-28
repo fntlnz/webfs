@@ -9,6 +9,7 @@
 
 static bool slist_free_all_is_call;
 static bool easy_clean_up_is_call;
+static bool easy_init_is_call;
 static std::vector<std::string> headerParam;
 static std::map<CURLoption, std::string> reqOption;
 static std::queue<std::string> response;
@@ -20,6 +21,7 @@ static long responseCode;
 void curlMock_init() {
   slist_free_all_is_call = false;
   easy_clean_up_is_call = false;
+  easy_init_is_call = false;
   headerParam.clear();
   reqOption.clear();
   write_callback = nullptr;
@@ -47,6 +49,10 @@ const std::string& curlMock_getOptionValue(CURLoption option) {
 
 bool curlMock_cleanup_isCall() {
   return easy_clean_up_is_call;
+}
+
+bool curlMock_init_isCall() {
+  return easy_init_is_call;
 }
 
 void curlMock_enqueuResponse(const std::string &text) {
@@ -77,6 +83,12 @@ CURLcode curl_easy_setopt(CURL *curl, CURLoption option,...){
   else if(option != CURLOPT_HTTPHEADER)
     reqOption.emplace(option,va_arg(arg,char*));
   return CURLE_OK;
+}
+
+CURL* curl_easy_init() {
+	easy_init_is_call=true;
+	//return a pointer != nullptr
+	return (CURL*) &easy_init_is_call;
 }
 
 void curl_easy_cleanup(CURL *curl) {

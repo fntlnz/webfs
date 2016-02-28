@@ -52,6 +52,12 @@ void curlMock_setResponseCode(long code);
  */
 bool curlMock_cleanup_isCall();
 
+/**
+ *
+ * @return true if the use call curl_easy_init()
+ */
+bool curlMock_init_isCall();
+
 
 CURLcode curl_easy_setopt(CURL *curl, CURLoption option, ...);
 CURLcode curl_easy_getinfo(CURL *curl, CURLINFO info,...);

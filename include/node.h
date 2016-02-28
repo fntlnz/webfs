@@ -5,6 +5,7 @@
 #ifndef WEBFS_NODE_H_
 #define WEBFS_NODE_H_
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -18,30 +19,44 @@ namespace webfs {
  * external storage
  */
 class Node {
+
   public:
+
+
     enum class Type {
       BRANCH,
       LEAF,
     };
 
-    Node(const std::string &n):
-      name(n),parent(nullptr){}
+    Node(const std::string &n={}):
+      name(n),parent(nullptr),children(),file(nullptr){
+    	std::cout<<"create node"<<std::endl;
+    }
+
+    Node(Node* p,const std::string &n):
+              name(n),parent(p),children(),file(nullptr){
+    	std::cout<<"create child"<<n<<std::endl;
+    }
 
     /**
      * Add a child to the current Node
      */
-    //TODO(wise): how we handle the pointer? who have to free it?
-    //ad a function create Child and do the allocation inside the class?
-    void addChild(Node *child);
+    Node& createChild(const std::string &n){
+    	children.emplace_back(this,n);
+    	return children.back();
+    }
+
+    void addChild(Node &&newChild){
+		children.push_back(newChild);
+    }
 
     /**
      * Find the node at the provided relativePath (relative to the current node)
      * starting from the current Node.
      */
-    //TODO(wise): return a const reference?
-    Node *findChild(const std::string &relativePath);
-    //TODO(wise): return a const reference?
-    Node *findParent(const std::string &relativePath);
+
+    Node* findChild(const std::string &relativePath);
+    Node* findParent(const std::string &relativePath);
 
     const std::string& getName()const{
       return name;
@@ -51,7 +66,7 @@ class Node {
       return children.size()==0 ? Type::LEAF : Type::BRANCH;
     }
 
-    const std::vector<Node*> getChildren()const{
+    const std::vector<Node>& getChildren()const{
       return children;
     }
 
@@ -68,7 +83,7 @@ class Node {
 
       // check if children are equal
       for(auto i=0u; i< children.size();i++){
-        if ((*children[i]) != (*other.children[i])) {
+        if ((children[i]) != (other.children[i])) {
           return false;
         }
       }// for
@@ -80,15 +95,19 @@ class Node {
       return !(*this == other);
     }
 
-    File *file;
+    Node* getParent(){
+    	return parent;
+    }
 
   private:
 
     Node* findInChildren(const std::string &currentName);
     std::string name;
-    Node *parent;
+    Node *const parent;
 
-    std::vector<Node *> children;
+    std::vector<Node> children;
+  public:
+    File *file;
 }; //Node
 
 } // webfs namespace

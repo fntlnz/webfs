@@ -61,6 +61,7 @@ static std::string uploadFileRequest(const std::string &fileName,
 
 Gist::Gist() :
   httpReqHeaders(nullptr),withAuth(false) {
+  curl_global_init(CURL_GLOBAL_NOTHING);
   httpReqHeaders = curl_slist_append(httpReqHeaders,
       "cache-control: no-cache");
   httpReqHeaders = curl_slist_append(httpReqHeaders, "User-Agent: webFS");
@@ -79,7 +80,7 @@ Gist::Gist(const string &accessToken) :
 }
 
 pCURL Gist::getBaseRemoteRequest(const std::string &url) {
-  CURL * curl = curl_easy_init();
+  CURL *curl = curl_easy_init();
   if (url.empty())
     curl_easy_setopt(curl, CURLOPT_URL, GIST_API_URL);
   else
@@ -92,6 +93,7 @@ pCURL Gist::getBaseRemoteRequest(const std::string &url) {
 pStorageId Gist::write(const std::vector<char> &buf) {
 
   pCURL curl = getBaseRemoteRequest();
+
   curl_easy_setopt(curl.get(), CURLOPT_CUSTOMREQUEST, "POST");
 
   std::string message = uploadFileRequest("WebFs",buf);

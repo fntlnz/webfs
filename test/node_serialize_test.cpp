@@ -48,9 +48,9 @@ TEST_F(NodeTestDumpJson, writeLeafNode) {
 
   checkHasAllField(readNode);
 
-  Node *rebuiltNode = NodeSerializer::unserialize(readNode);
-  EXPECT_EQ(root, *rebuiltNode);
-  delete rebuiltNode;
+  Node rebuiltNode = NodeSerializer::unserialize(readNode);
+  EXPECT_EQ(root, rebuiltNode);
+
 }
 
 TEST_F(NodeTestDumpJson, writeBranchNode) {
@@ -62,9 +62,8 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
   Node dir1c1("childe1");
   Node c1 ("childe2");
 
-  root.addChild(&c1);
-  root.addChild(&dir1);
-  dir1.addChild(&dir1c1);
+  root.createChild("child1");
+  root.createChild("dir1").createChild("child2");
 
   NodeSerializer::serialize(root, *writer);
 
@@ -75,7 +74,7 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
 
   checkHasAllField(readNode);
   
-  Node *rebuiltNode = NodeSerializer::unserialize(readNode);
-  EXPECT_EQ(root, *rebuiltNode);
+  Node rebuiltNode = NodeSerializer::unserialize(readNode);
+  EXPECT_EQ(root, rebuiltNode);
 }
 

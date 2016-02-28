@@ -19,8 +19,8 @@ class NodeSerializer {
       if(node.getType()!=Node::Type::LEAF){
         out.String(CHILDREN_TAG);
         out.StartArray();
-        for(const Node *n : node.getChildren()) {
-          NodeSerializer::serialize(*n, out);
+        for(const Node &n : node.getChildren()) {
+          NodeSerializer::serialize(n, out);
         }
         out.EndArray();
       }//if !isLeaf
@@ -28,7 +28,7 @@ class NodeSerializer {
       out.EndObject();
     }//serialize
 
-    static Node *unserialize(const rapidjson::Value &jsonNode);
+    static Node unserialize(const rapidjson::Value &jsonNode);
 
   private:
 

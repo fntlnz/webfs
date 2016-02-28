@@ -23,7 +23,7 @@ public:
 TEST_F(TestWriteGist, extractResponse) {
   webfs::storage::Gist gist;
 
-  auto idIt= gist.write(fileContent)->getRemoteReadUrl().rfind(remoteId);
+  auto idIt= gist.write(fileContent)->getRemoteReadUrl().find(remoteId);
   EXPECT_TRUE(idIt!=std::string::npos);
 
 

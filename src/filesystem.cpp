@@ -1,24 +1,12 @@
+#include <cassert>
 #include "filesystem.h"
 
 using namespace webfs;
 
-Node *Filesystem::createDirectory(const std::string &path) {
-	//TODO REMOVE ME
-	return createElement(path);
-}
-
-Node *Filesystem::createFile(const std::string &path) {
-	//TODO REMOVE ME
-  return createElement(path);
-}
-
-Node *Filesystem::createElement(const std::string &path) {
+Node& Filesystem::createElement(const std::string &path) {
   Node *parent = rootNode->findParent(path);
-
-  Node *curNode = new Node(
-      utils::explode(path, '/').back());
-  parent->addChild(curNode);
-  return curNode;
+  assert(parent!=nullptr);
+  return parent->createChild(utils::explode(path, '/').back());
 }
 
 int Filesystem::writeChunk(const std::string &path, const char *buf, size_t size, off_t offset) {

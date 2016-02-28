@@ -32,6 +32,7 @@ public:
    */
   Gist(const std::string &accessTocken);
 
+
   Storage::pStorageId write(const std::vector<char> &buf) override;
 
   std::vector<char> read(const Storage::pStorageId &remoteId) override;
@@ -47,6 +48,7 @@ public:
 
   virtual ~Gist() {
     curl_slist_free_all(httpReqHeaders);
+    curl_global_cleanup();
   }
 
 private:

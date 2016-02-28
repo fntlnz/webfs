@@ -8,12 +8,11 @@ TEST(FilesystemTest, TestCreateDirectory) {
 
   Filesystem fs(&root);
 
-  auto createdDirectory = fs.createDirectory("/mycreateddir");
+  Node &createdDirectory = fs.createElement("/mycreateddir");
 
-  auto foundCreatedDirectory = root.findChild("mycreateddir");
+  Node *foundCreatedDirectory = root.findChild("mycreateddir");
 
-  EXPECT_EQ(foundCreatedDirectory, createdDirectory);
-  delete createdDirectory;
+  EXPECT_EQ(*foundCreatedDirectory, createdDirectory);
 }
 
 TEST(FilesystemTest, TestCreateFile) {
@@ -22,11 +21,11 @@ TEST(FilesystemTest, TestCreateFile) {
 
   Filesystem fs(&root);
 
-  auto createdFile = fs.createFile("/dummyfile.txt");
+  Node& createdFile = fs.createElement("/dummyfile.txt");
 
-  fs.createFile("/dummyfile.txt");
+  fs.createElement("/dummyfile.txt");
 
-  auto foundCreatedFile = root.findChild("dummyfile.txt");
+  Node* foundCreatedFile = root.findChild("dummyfile.txt");
 
-  EXPECT_EQ(foundCreatedFile, createdFile);
+  EXPECT_EQ(*foundCreatedFile, createdFile);
 }
