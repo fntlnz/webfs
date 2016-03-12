@@ -57,13 +57,14 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
   using namespace rapidjson;
   using namespace webfs;
 
-  Node root ("writeMe");
-  Node dir1 ("dir1");
-  Node dir1c1("childe1");
-  Node c1 ("childe2");
+  Node root ("writeMe", Node::Type::BRANCH);
+  Node dir1 ("dir1", Node::Type::BRANCH);
+  Node dir1c1("childe1", Node::Type::LEAF);
+  Node c1 ("childe2", Node::Type::BRANCH);
 
-  root.createChild("child1");
-  root.createChild("dir1").createChild("child2");
+  root.createChild("child1", Node::Type::LEAF);
+  root.createChild("dir1", Node::Type::BRANCH)
+    .createChild("child2", Node::Type::LEAF);
 
   NodeSerializer::serialize(root, *writer);
 
@@ -73,7 +74,7 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
   readNode.Parse(buffer.GetString());
 
   checkHasAllField(readNode);
-  
+
   Node rebuiltNode = NodeSerializer::unserialize(readNode);
   EXPECT_EQ(root, rebuiltNode);
 }

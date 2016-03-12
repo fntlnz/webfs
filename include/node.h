@@ -28,26 +28,22 @@ class Node {
       LEAF,
     };
 
-    Node(const std::string &n={}):
-      name(n),parent(nullptr),children(),file(nullptr){
-    	std::cout<<"create node"<<std::endl;
-    }
+    Node(const std::string &n={}, Type t=Type::LEAF):
+      name(n),parent(nullptr),children(),type(t),file(nullptr){}
 
-    Node(Node* p,const std::string &n):
-              name(n),parent(p),children(),file(nullptr){
-    	std::cout<<"create child"<<n<<std::endl;
+    Node(Node* p,const std::string &n, Type t=Type::LEAF):
+              name(n),parent(p),children(),type(t),file(nullptr){}
+
+    Node& createChild(const std::string &n, Type type) {
+      children.emplace_back(this,n, type);
+      return children.back();
     }
 
     /**
      * Add a child to the current Node
      */
-    Node& createChild(const std::string &n){
-    	children.emplace_back(this,n);
-    	return children.back();
-    }
-
     void addChild(Node &&newChild){
-		children.push_back(newChild);
+      children.push_back(newChild);
     }
 
     /**
@@ -62,8 +58,8 @@ class Node {
       return name;
     }
 
-    const Type getType()const {
-      return children.size()==0 ? Type::LEAF : Type::BRANCH;
+    Type getType()const {
+      return type;
     }
 
     const std::vector<Node>& getChildren()const{
@@ -96,7 +92,7 @@ class Node {
     }
 
     Node* getParent(){
-    	return parent;
+      return parent;
     }
 
   private:
@@ -106,6 +102,8 @@ class Node {
     Node *const parent;
 
     std::vector<Node> children;
+
+    Type type;
   public:
     File *file;
 }; //Node

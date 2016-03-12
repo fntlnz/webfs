@@ -11,7 +11,8 @@ class Filesystem {
   public:
     Filesystem(Node *root): rootNode(root){}
 
-    Node& createElement(const std::string &path);
+    Node& createElementDirectory(const std::string &path);
+    Node& createElementFile(const std::string &path);
     Node *findNode(const std::string &path);
     int writeChunk(const std::string &path, const char *buf, size_t size, off_t offset);
 

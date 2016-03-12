@@ -2,30 +2,30 @@
 #include "node.h"
 
 TEST(NodeTest, RootHasNotParent) {
-	using namespace webfs;
-	Node root("");
-	EXPECT_EQ(nullptr, root.getParent());
+  using namespace webfs;
+  Node root("");
+  EXPECT_EQ(nullptr, root.getParent());
 }
 
 TEST(NodeTest, SingleNodeIsLeaf) {
-	using namespace webfs;
-	Node root("");
-	EXPECT_EQ(Node::Type::LEAF, root.getType());
+  using namespace webfs;
+  Node root("");
+  EXPECT_EQ(Node::Type::LEAF, root.getType());
 }
 
 TEST(NodeTest, NodeWithChidIsBranch) {
-	using namespace webfs;
-	Node root("parent");
-	Node &child = root.createChild("child");
-	EXPECT_EQ(Node::Type::BRANCH, root.getType());
-	EXPECT_EQ(Node::Type::LEAF, child.getType());
+  using namespace webfs;
+  Node root("parent", Node::Type::BRANCH);
+  Node &child = root.createChild("child", Node::Type::LEAF);
+  EXPECT_EQ(Node::Type::BRANCH, root.getType());
+  EXPECT_EQ(Node::Type::LEAF, child.getType());
 }
 
 TEST(NodeTest, TestAddChild) {
   using namespace webfs;
 
   Node root("");
-  Node &child = root.createChild("child");
+  Node &child = root.createChild("child", Node::Type::LEAF);
 
   EXPECT_EQ(1u, root.getChildren().size());
   EXPECT_EQ(child, root.getChildren().front());
@@ -39,9 +39,9 @@ TEST(NodeTest, TestAddChild) {
 TEST(NodeTest, TestFindParent) {
   using namespace webfs;
 
-  Node root("");
+  Node root("", Node::Type::BRANCH);
 
-  Node &folder = root.createChild( "folder");
+  Node &folder = root.createChild( "folder", Node::Type::LEAF);
 
   auto *parent = root.findParent("/example.txt");
   EXPECT_EQ(parent, &root);
@@ -58,15 +58,17 @@ TEST(NodeTest, TestFindParent) {
 TEST(NodeTest, TestFindChild) {
   using namespace webfs;
 
-  Node root;
+  Node root("", Node::Type::BRANCH);
 
-  root.createChild("folder").createChild("subFolder").createChild("myAwesome.txt");
-  root.createChild("folder2");
+  root.createChild("folder", Node::Type::BRANCH)
+    .createChild("subFolder", Node::Type::BRANCH)
+    .createChild("myAwesome.txt", Node::Type::LEAF);
+  root.createChild("folder2", Node::Type::BRANCH);
 
   Node *foundFolder2 = root.findChild("/folder2");
   EXPECT_TRUE(foundFolder2!=nullptr);
   EXPECT_EQ(foundFolder2->getName(), "folder2");
-  EXPECT_EQ(foundFolder2->getType(), Node::Type::LEAF);
+  EXPECT_EQ(foundFolder2->getType(), Node::Type::BRANCH);
   EXPECT_EQ(foundFolder2->getParent(),&root);
 
   Node *foundFolder = root.findChild("/folder");
@@ -103,7 +105,7 @@ TEST(NodeEqualTest, NodeWithDifferentTypeAreDifferent) {
   using namespace webfs;
 
   Node n1 ("name1");
-  n1.createChild("Child");
+  n1.createChild("Child", Node::Type::LEAF);
   Node n2 ("name1");
 
   EXPECT_FALSE(n1==n2);
@@ -114,10 +116,10 @@ TEST(NodeEqualTest, NodeWithDifferentChildAreDifferent) {
   using namespace webfs;
 
   Node r1("name1");
-  r1.createChild("childName1");
+  r1.createChild("childName1", Node::Type::LEAF);
 
   Node r2 ("name1");
-  r2.createChild("childName2");
+  r2.createChild("childName2", Node::Type::LEAF);
 
 
   EXPECT_FALSE(r1==r2);
@@ -128,11 +130,11 @@ TEST(NodeEqualTest, NodeWithSameChildInDifferentObjectAreEqual) {
   using namespace webfs;
 
   Node r1 ("name1");
-  r1.createChild("childName1");
+  r1.createChild("childName1", Node::Type::LEAF);
 
 
   Node r2 ("name1");
-  r2.createChild("childName1");
+  r2.createChild("childName1", Node::Type::LEAF);
 
   EXPECT_TRUE(r1==r2);
   EXPECT_FALSE(r1!=r2);

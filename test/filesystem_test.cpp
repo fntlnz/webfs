@@ -4,11 +4,11 @@
 TEST(FilesystemTest, TestCreateDirectory) {
   using namespace webfs;
 
-  Node root("");
+  Node root("", Node::Type::BRANCH);
 
   Filesystem fs(&root);
 
-  Node &createdDirectory = fs.createElement("/mycreateddir");
+  Node &createdDirectory = fs.createElementDirectory("/mycreateddir");
 
   Node *foundCreatedDirectory = root.findChild("mycreateddir");
 
@@ -17,13 +17,11 @@ TEST(FilesystemTest, TestCreateDirectory) {
 
 TEST(FilesystemTest, TestCreateFile) {
   using namespace webfs;
-  Node root("");
+  Node root("", Node::Type::BRANCH);
 
   Filesystem fs(&root);
 
-  Node& createdFile = fs.createElement("/dummyfile.txt");
-
-  fs.createElement("/dummyfile.txt");
+  Node& createdFile = fs.createElementFile("/dummyfile.txt");
 
   Node* foundCreatedFile = root.findChild("dummyfile.txt");
 

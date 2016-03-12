@@ -3,10 +3,17 @@
 
 using namespace webfs;
 
-Node& Filesystem::createElement(const std::string &path) {
+Node& Filesystem::createElementDirectory(const std::string &path) {
   Node *parent = rootNode->findParent(path);
   assert(parent!=nullptr);
-  return parent->createChild(utils::explode(path, '/').back());
+  return parent->createChild(utils::explode(path, '/').back(), Node::Type::BRANCH);
+}
+
+
+Node& Filesystem::createElementFile(const std::string &path) {
+  Node *parent = rootNode->findParent(path);
+  assert(parent!=nullptr);
+  return parent->createChild(utils::explode(path, '/').back(), Node::Type::LEAF);
 }
 
 int Filesystem::writeChunk(const std::string &path, const char *buf, size_t size, off_t offset) {
