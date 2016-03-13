@@ -22,7 +22,6 @@ class Node {
 
   public:
 
-
     enum class Type {
       BRANCH,
       LEAF,
@@ -34,15 +33,16 @@ class Node {
     Node(Node* p,const std::string &n, Type t=Type::LEAF):
               name(n),parent(p),children(),type(t),file(nullptr){}
 
-    Node& createChild(const std::string &n, Type type) {
-      children.emplace_back(this,n, type);
-      return children.back();
+    Node* createChild(const std::string &n, Type type) {
+      Node* node = new Node(this, n, type);
+      addChild(node);
+      return node;
     }
 
     /**
      * Add a child to the current Node
      */
-    void addChild(Node &&newChild){
+    void addChild(Node *newChild){
       children.push_back(newChild);
     }
 
@@ -62,7 +62,7 @@ class Node {
       return type;
     }
 
-    const std::vector<Node>& getChildren()const{
+    const std::vector<Node*>& getChildren()const{
       return children;
     }
 
@@ -79,7 +79,7 @@ class Node {
 
       // check if children are equal
       for(auto i=0u; i< children.size();i++){
-        if ((children[i]) != (other.children[i])) {
+        if ((*children[i]) != (*other.children[i])) {
           return false;
         }
       }// for
@@ -96,12 +96,11 @@ class Node {
     }
 
   private:
-
     Node* findInChildren(const std::string &currentName);
     std::string name;
     Node *const parent;
 
-    std::vector<Node> children;
+    std::vector<Node*> children;
 
     Type type;
   public:

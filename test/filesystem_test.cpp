@@ -4,26 +4,26 @@
 TEST(FilesystemTest, TestCreateDirectory) {
   using namespace webfs;
 
-  Node root("", Node::Type::BRANCH);
+  Node* root = new Node("", Node::Type::BRANCH);
 
-  Filesystem fs(&root);
+  Filesystem fs(root);
 
-  Node &createdDirectory = fs.createElementDirectory("/mycreateddir");
+  Node* createdDirectory = fs.createElementDirectory("/mycreateddir");
 
-  Node *foundCreatedDirectory = root.findChild("mycreateddir");
+  Node *foundCreatedDirectory = root->findChild("mycreateddir");
 
-  EXPECT_EQ(*foundCreatedDirectory, createdDirectory);
+  EXPECT_EQ(foundCreatedDirectory, createdDirectory);
 }
 
 TEST(FilesystemTest, TestCreateFile) {
   using namespace webfs;
-  Node root("", Node::Type::BRANCH);
+  Node* root = new Node("", Node::Type::BRANCH);
 
-  Filesystem fs(&root);
+  Filesystem fs(root);
 
-  Node& createdFile = fs.createElementFile("/dummyfile.txt");
+  Node* createdFile = fs.createElementFile("/dummyfile.txt");
 
-  Node* foundCreatedFile = root.findChild("dummyfile.txt");
+  Node* foundCreatedFile = root->findChild("dummyfile.txt");
 
-  EXPECT_EQ(*foundCreatedFile, createdFile);
+  EXPECT_EQ(foundCreatedFile, createdFile);
 }

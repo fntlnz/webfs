@@ -87,7 +87,7 @@ static int mknod_callback(const char *path, mode_t mode, dev_t dev) {
 
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
   const std::string p(path);
-  filesystem->createFile(p);
+  filesystem->createElementFile(p);
   return 0;
 }
 
@@ -98,7 +98,7 @@ static int utime_callback(const char *path, struct utimbuf *buf) {
 
 static int mkdir_callback(const char *path, mode_t mode) {
   const std::string p(path);
-  filesystem->createDirectory(p);
+  filesystem->createElementDirectory(p);
   return 0;
 }
 
