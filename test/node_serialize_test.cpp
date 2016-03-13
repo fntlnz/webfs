@@ -37,7 +37,7 @@ TEST_F(NodeTestDumpJson, writeLeafNode) {
   using namespace webfs;
 
   const std::string nodeName("writeMe");
-  Node* root = new Node("", Node::Type::BRANCH);
+  Node* root = new Node(nodeName, Node::Type::BRANCH);
 
   NodeSerializer::serialize(root, *writer);
 
@@ -49,7 +49,7 @@ TEST_F(NodeTestDumpJson, writeLeafNode) {
   checkHasAllField(readNode);
 
   Node *rebuiltNode = NodeSerializer::unserialize(readNode);
-  EXPECT_EQ(root, rebuiltNode);
+  EXPECT_EQ(*root, *rebuiltNode);
 
 }
 
@@ -73,6 +73,6 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
   checkHasAllField(readNode);
 
   Node *rebuiltNode = NodeSerializer::unserialize(readNode);
-  EXPECT_EQ(root, rebuiltNode);
+  EXPECT_EQ(*root, *rebuiltNode);
 }
 

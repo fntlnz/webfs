@@ -34,7 +34,7 @@ class Node {
               name(n),parent(p),children(),type(t),file(nullptr){}
 
     Node* createChild(const std::string &n, Type type) {
-      Node* node = new Node(n, type);
+      Node* node = new Node(this, n, type);
       addChild(node);
       return node;
     }
@@ -79,7 +79,7 @@ class Node {
 
       // check if children are equal
       for(auto i=0u; i< children.size();i++){
-        if ((children[i]) != (other.children[i])) {
+        if ((*children[i]) != (*other.children[i])) {
           return false;
         }
       }// for

@@ -9,7 +9,7 @@ TEST(NodeTest, RootHasNotParent) {
 
 TEST(NodeTest, SingleNodeIsLeaf) {
   using namespace webfs;
-  Node* root = new Node("", Node::Type::BRANCH);
+  Node* root = new Node("", Node::Type::LEAF);
   EXPECT_EQ(Node::Type::LEAF, root->getType());
 }
 
@@ -31,8 +31,6 @@ TEST(NodeTest, TestAddChild) {
   EXPECT_EQ(child, root->getChildren().front());
   EXPECT_EQ("child", child->getName());
   EXPECT_EQ(root, child->getParent());
-
-
 }
 
 TEST(NodeTest, TestFindParent) {
@@ -90,11 +88,12 @@ TEST(NodeTest, TestFindChild) {
 
 }
 
+/* Overloaded operators */
 TEST(NodeEqualTest, NodeWithDifferentNameAreDifferent) {
   using namespace webfs;
 
-  Node n1 ("name1");
-  Node n2 ("name2");
+  Node n1("name1", Node::Type::BRANCH);
+  Node n2("name2", Node::Type::BRANCH);
 
   EXPECT_FALSE(n1==n2);
   EXPECT_TRUE(n1!=n2);
@@ -103,9 +102,10 @@ TEST(NodeEqualTest, NodeWithDifferentNameAreDifferent) {
 TEST(NodeEqualTest, NodeWithDifferentTypeAreDifferent) {
   using namespace webfs;
 
-  Node n1 ("name1");
+  Node n1("name1", Node::Type::BRANCH);
   n1.createChild("Child", Node::Type::LEAF);
-  Node n2 ("name1");
+
+  Node n2("name1", Node::Type::LEAF);
 
   EXPECT_FALSE(n1==n2);
   EXPECT_TRUE(n1!=n2);
@@ -114,12 +114,11 @@ TEST(NodeEqualTest, NodeWithDifferentTypeAreDifferent) {
 TEST(NodeEqualTest, NodeWithDifferentChildAreDifferent) {
   using namespace webfs;
 
-  Node r1("name1");
+  Node r1("name1", Node::Type::BRANCH);
   r1.createChild("childName1", Node::Type::LEAF);
 
-  Node r2 ("name1");
+  Node r2("name1", Node::Type::BRANCH);
   r2.createChild("childName2", Node::Type::LEAF);
-
 
   EXPECT_FALSE(r1==r2);
   EXPECT_TRUE(r1!=r2);
@@ -128,11 +127,10 @@ TEST(NodeEqualTest, NodeWithDifferentChildAreDifferent) {
 TEST(NodeEqualTest, NodeWithSameChildInDifferentObjectAreEqual) {
   using namespace webfs;
 
-  Node r1 ("name1");
+  Node r1("name1", Node::Type::BRANCH);
   r1.createChild("childName1", Node::Type::LEAF);
 
-
-  Node r2 ("name1");
+  Node r2("name1", Node::Type::BRANCH);
   r2.createChild("childName1", Node::Type::LEAF);
 
   EXPECT_TRUE(r1==r2);
