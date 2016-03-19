@@ -36,14 +36,14 @@ class NodeSerializer {
 
   private:
 
-    /*
+    
     static inline Node::Type extractType(const rapidjson::Value &jsonNode){
       if(jsonNode[IS_LEAF_TAG].GetBool())
         return Node::Type::LEAF;
       else
         return Node::Type::BRANCH;
     }
-    */
+    
 
     const static std::string NAME_TAG;
     const static std::string IS_LEAF_TAG;

@@ -104,9 +104,8 @@ TEST(NodeEqualTest, NodeWithDifferentNameAreDifferent) {
 TEST(NodeEqualTest, NodeWithDifferentTypeAreDifferent) {
   using namespace webfs;
 
-  Node n1 ("name1");
-  n1.createChild("Child", Node::Type::LEAF);
-  Node n2 ("name1");
+  Node n1 ("name1",Node::Type::LEAF);
+  Node n2 ("name1",Node::Type::BRANCH);
 
   EXPECT_FALSE(n1==n2);
   EXPECT_TRUE(n1!=n2);

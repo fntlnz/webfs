@@ -83,8 +83,11 @@ class Node {
      * Check if two nodes are equal comparing their properties and children
      */
     bool operator==(const Node &other)const {
-      bool nodeAreEqual = (name==other.name  &&
-          children.size()==other.children.size());
+      bool nodeAreEqual = (
+              name==other.name  &&
+              type == other.type &&
+              children.size()==other.children.size()
+      );
 
       if(!nodeAreEqual){
         return false;

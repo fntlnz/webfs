@@ -8,7 +8,8 @@ const std::string NodeSerializer::CHILDREN_TAG("children");
 
 std::shared_ptr<Node> NodeSerializer::unserialize(const rapidjson::Value &jsonNode) {
   using namespace rapidjson;
-  std::shared_ptr<Node> root = std::make_shared<Node>(jsonNode[NAME_TAG].GetString());
+
+  std::shared_ptr<Node> root = std::make_shared<Node>(jsonNode[NAME_TAG].GetString(),extractType(jsonNode));
 
   if(jsonNode.HasMember(CHILDREN_TAG)){
     const rapidjson::Value &childrenJson = jsonNode[CHILDREN_TAG];
