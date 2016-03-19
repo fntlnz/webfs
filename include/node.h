@@ -46,6 +46,7 @@ class Node {
      * Add a child to the current Node
      */
     void addChild(std::shared_ptr<Node> newChild){
+      type = Type::BRANCH;
       children.emplace_back(newChild);
     }
 

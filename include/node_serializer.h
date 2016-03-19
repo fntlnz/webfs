@@ -14,19 +14,22 @@ class NodeSerializer {
     template<typename BufferType>
     static void serialize( Node &node, rapidjson::Writer<BufferType> &out) {
       out.StartObject();
+      out.String(IS_LEAF_TAG);
+      const bool isLeaf= node.getType() == Node::Type::LEAF;
+      out.Bool(isLeaf);
       out.String(NAME_TAG);
       out.String(node.getName());
 
-      if(node.getType()!=Node::Type::LEAF){
+      if(!isLeaf){
         out.String(CHILDREN_TAG);
         out.StartArray();
-        for(const std::weak_ptr<Node> &n : node.getChildren()) {
+        for(auto n : node.getChildren()) {
           NodeSerializer::serialize(*n.lock(), out);
         }
         out.EndArray();
       }//if !isLeaf
 
-      out.EndObject();
+      out.EndObject(); 
     }//serialize
 
     static std::shared_ptr<Node> unserialize(const rapidjson::Value &jsonNode);

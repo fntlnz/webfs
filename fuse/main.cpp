@@ -23,7 +23,7 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
     p = "";
   }
 
-  webfs::Node *node = filesystem->findNode(p);
+  auto node = filesystem->findNode(p).lock();
 
   if (node == nullptr) {
     return -ENOENT;
@@ -54,9 +54,9 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
   filler(buf, ".", NULL, 0);
   filler(buf, "..", NULL, 0);
 
-  const auto directory = filesystem->findNode(p);
+  const auto directory = filesystem->findNode(p).lock();
   for(const auto n : directory->getChildren()) {
-    filler(buf, n->getName().c_str(), NULL, 0);
+    filler(buf, n.lock()->getName().c_str(), NULL, 0);
   }
 
   return 0;
@@ -87,7 +87,7 @@ static int mknod_callback(const char *path, mode_t mode, dev_t dev) {
 
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
   const std::string p(path);
-  filesystem->createFile(p);
+  filesystem->createElementFile(p);
   return 0;
 }
 
@@ -98,7 +98,7 @@ static int utime_callback(const char *path, struct utimbuf *buf) {
 
 static int mkdir_callback(const char *path, mode_t mode) {
   const std::string p(path);
-  filesystem->createDirectory(p);
+  filesystem->createElementDirectory(p);
   return 0;
 }
 
