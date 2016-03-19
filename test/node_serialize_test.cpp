@@ -36,10 +36,9 @@ TEST_F(NodeTestDumpJson, writeLeafNode) {
   using namespace rapidjson;
   using namespace webfs;
 
-  const std::string nodeName("writeMe");
-  Node root (nodeName);
+  auto root =std::make_shared<Node>(std::string("writeMe"));
 
-  NodeSerializer::serialize(root, *writer);
+  NodeSerializer::serialize(*root, *writer);
 
   //std::cout<<buffer.GetString()<<std::endl;
 
@@ -48,8 +47,8 @@ TEST_F(NodeTestDumpJson, writeLeafNode) {
 
   checkHasAllField(readNode);
 
-  Node rebuiltNode = NodeSerializer::unserialize(readNode);
-  EXPECT_EQ(root, rebuiltNode);
+  auto rebuiltNode = NodeSerializer::unserialize(readNode);
+  EXPECT_EQ(*root, *rebuiltNode);
 
 }
 
@@ -57,16 +56,16 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
   using namespace rapidjson;
   using namespace webfs;
 
-  Node root ("writeMe", Node::Type::BRANCH);
+  auto root = std::make_shared<Node>("writeMe", Node::Type::BRANCH);
   Node dir1 ("dir1", Node::Type::BRANCH);
   Node dir1c1("childe1", Node::Type::LEAF);
   Node c1 ("childe2", Node::Type::BRANCH);
 
-  root.createChild("child1", Node::Type::LEAF);
-  root.createChild("dir1", Node::Type::BRANCH)
-    .createChild("child2", Node::Type::LEAF);
+  root->createChild("child1", Node::Type::LEAF);
+  root->createChild("dir1", Node::Type::BRANCH).lock()->
+          createChild("child2", Node::Type::LEAF);
 
-  NodeSerializer::serialize(root, *writer);
+  NodeSerializer::serialize(*root, *writer);
 
   //std::cout<<buffer.GetString()<<std::endl;
 
@@ -75,7 +74,7 @@ TEST_F(NodeTestDumpJson, writeBranchNode) {
 
   checkHasAllField(readNode);
 
-  Node rebuiltNode = NodeSerializer::unserialize(readNode);
-  EXPECT_EQ(root, rebuiltNode);
+  auto rebuiltNode = NodeSerializer::unserialize(readNode);
+  EXPECT_EQ(*root, *rebuiltNode);
 }
 

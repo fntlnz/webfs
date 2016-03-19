@@ -16,74 +16,74 @@ TEST(NodeTest, SingleNodeIsLeaf) {
 TEST(NodeTest, NodeWithChidIsBranch) {
   using namespace webfs;
   Node root("parent", Node::Type::BRANCH);
-  Node &child = root.createChild("child", Node::Type::LEAF);
+
+  auto child = root.createChild("child", Node::Type::LEAF);
+
   EXPECT_EQ(Node::Type::BRANCH, root.getType());
-  EXPECT_EQ(Node::Type::LEAF, child.getType());
+  EXPECT_EQ(Node::Type::LEAF, child.lock()->getType());
 }
 
 TEST(NodeTest, TestAddChild) {
   using namespace webfs;
 
   Node root("");
-  Node &child = root.createChild("child", Node::Type::LEAF);
+  auto child = root.createChild("child", Node::Type::LEAF);
 
   EXPECT_EQ(1u, root.getChildren().size());
-  EXPECT_EQ(child, root.getChildren().front());
-  EXPECT_EQ(&child, &root.getChildren().front());
-  EXPECT_EQ("child", child.getName());
-  EXPECT_EQ(&root, child.getParent());
-
+  EXPECT_EQ(child.lock(), root.getChildren().front().lock());
+  EXPECT_EQ("child", child.lock()->getName());
+  EXPECT_EQ(&root, child.lock()->getParent());
 
 }
 
 TEST(NodeTest, TestFindParent) {
   using namespace webfs;
 
-  Node root("", Node::Type::BRANCH);
+  auto root = std::make_shared<Node>("", Node::Type::BRANCH);
 
-  Node &folder = root.createChild( "folder", Node::Type::LEAF);
+  auto folder = root->createChild("folder", Node::Type::LEAF);
 
-  auto *parent = root.findParent("/example.txt");
-  EXPECT_EQ(parent, &root);
+  auto parent = Node::findParent(root,"/example.txt");
+  EXPECT_EQ(parent.lock(), root);
 
-  auto *folderParent = root.findParent("/folder/example.txt");
-  EXPECT_EQ(folderParent, &folder);
+  auto folderParent =Node::findParent(root,"/folder/example.txt");
+  EXPECT_EQ(folderParent.lock(), folder.lock());
 
-  auto *closestFolderSubParent = root.findParent("/folder/a/non-existing/strange/superlong/and/drammatically/silly/folder/containing/a/file.txt");
+  auto closestFolderSubParent = Node::findParent(root,"/folder/a/non-existing/strange/superlong/and/drammatically/silly/folder/containing/a/file.txt");
 
-  EXPECT_EQ(&folder, closestFolderSubParent);
+  EXPECT_EQ(folder.lock(), closestFolderSubParent.lock());
 }
 
 
 TEST(NodeTest, TestFindChild) {
   using namespace webfs;
 
-  Node root("", Node::Type::BRANCH);
+  auto root = std::make_shared<Node>("", Node::Type::BRANCH);
 
-  root.createChild("folder", Node::Type::BRANCH)
-    .createChild("subFolder", Node::Type::BRANCH)
-    .createChild("myAwesome.txt", Node::Type::LEAF);
-  root.createChild("folder2", Node::Type::BRANCH);
+  root->createChild("folder", Node::Type::BRANCH).lock()->
+    createChild("subFolder", Node::Type::BRANCH).lock()->
+    createChild("myAwesome.txt", Node::Type::LEAF);
+  root->createChild("folder2", Node::Type::BRANCH);
 
-  Node *foundFolder2 = root.findChild("/folder2");
+  auto foundFolder2 = Node::findChild(root,"/folder2").lock();
   EXPECT_TRUE(foundFolder2!=nullptr);
   EXPECT_EQ(foundFolder2->getName(), "folder2");
   EXPECT_EQ(foundFolder2->getType(), Node::Type::BRANCH);
-  EXPECT_EQ(foundFolder2->getParent(),&root);
+  EXPECT_EQ(foundFolder2->getParent(),root.get());
 
-  Node *foundFolder = root.findChild("/folder");
+  auto foundFolder = Node::findChild(root,"/folder").lock();
   EXPECT_TRUE(foundFolder!=nullptr);
   EXPECT_EQ(foundFolder->getName(), "folder");
   EXPECT_EQ(foundFolder->getType(), Node::Type::BRANCH);
-  EXPECT_EQ(foundFolder->getParent(),&root);
+  EXPECT_EQ(foundFolder->getParent(),root.get());
 
-  Node *foundInFolder = foundFolder->findChild("/subFolder/myAwesome.txt");
+  auto foundInFolder = Node::findChild(foundFolder,"/subFolder/myAwesome.txt").lock();
   EXPECT_TRUE(foundInFolder!=nullptr);
   EXPECT_EQ(foundInFolder->getName(), "myAwesome.txt");
   EXPECT_EQ(foundInFolder->getType(), Node::Type::LEAF);
   EXPECT_EQ(foundInFolder->getParent()->getName(), "subFolder");
 
-  Node *found = root.findChild("/folder/subFolder/myAwesome.txt");
+  auto found = Node::findChild(root,"/folder/subFolder/myAwesome.txt").lock();
   EXPECT_TRUE(found!=nullptr);
   EXPECT_EQ(found->getName(), "myAwesome.txt");
   EXPECT_EQ(found->getType(), Node::Type::LEAF);

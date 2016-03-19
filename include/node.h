@@ -5,9 +5,13 @@
 #ifndef WEBFS_NODE_H_
 #define WEBFS_NODE_H_
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
+#include <utility>
+#include <experimental/optional>
 
 #include "utils.h"
 #include "file.h"
@@ -22,8 +26,7 @@ class Node {
 
   public:
 
-
-    enum class Type {
+    enum  class Type {
       BRANCH,
       LEAF,
     };
@@ -34,16 +37,16 @@ class Node {
     Node(Node* p,const std::string &n, Type t=Type::LEAF):
               name(n),parent(p),children(),type(t),file(nullptr){}
 
-    Node& createChild(const std::string &n, Type type) {
-      children.emplace_back(this,n, type);
+    std::weak_ptr<Node> createChild(const std::string &n, Type type) {
+      children.push_back(std::make_shared<Node>(this,n, type));
       return children.back();
     }
 
     /**
      * Add a child to the current Node
      */
-    void addChild(Node &&newChild){
-      children.push_back(newChild);
+    void addChild(std::shared_ptr<Node> newChild){
+      children.emplace_back(newChild);
     }
 
     /**
@@ -51,8 +54,10 @@ class Node {
      * starting from the current Node.
      */
 
-    Node* findChild(const std::string &relativePath);
-    Node* findParent(const std::string &relativePath);
+    static std::weak_ptr<Node> findChild(const std::weak_ptr<Node> &node,
+    		const std::string &relativePath);
+    static std::weak_ptr<Node> findParent(const std::weak_ptr<Node> &node,
+    		const std::string &relativePath);
 
     const std::string& getName()const{
       return name;
@@ -62,8 +67,15 @@ class Node {
       return type;
     }
 
-    const std::vector<Node>& getChildren()const{
-      return children;
+    //TODO: ADD CONST?
+    std::vector<std::weak_ptr<Node>> getChildren(){
+    	std::vector<std::weak_ptr<Node>> temp(children.size());
+
+    	std::transform(std::begin(children),std::end(children),std::begin(temp),[](std::shared_ptr<Node> &temp){
+    		return std::weak_ptr<Node>(temp);
+    	});
+
+    	return temp;
     }
 
     /**
@@ -79,7 +91,7 @@ class Node {
 
       // check if children are equal
       for(auto i=0u; i< children.size();i++){
-        if ((children[i]) != (other.children[i])) {
+        if ((*children[i]) != (*other.children[i])) {
           return false;
         }
       }// for
@@ -97,11 +109,12 @@ class Node {
 
   private:
 
-    Node* findInChildren(const std::string &currentName);
+    static std::weak_ptr<Node> findInChildren(const std::weak_ptr<Node> &node,
+    		const std::string &currentName);
     std::string name;
     Node *const parent;
 
-    std::vector<Node> children;
+    std::vector<std::shared_ptr<Node>> children;
 
     Type type;
   public:

@@ -10,8 +10,9 @@ namespace webfs {
 
 class NodeSerializer {
   public:
+	//TODO ADD CONST TO NODE?
     template<typename BufferType>
-    static void serialize(const Node &node, rapidjson::Writer<BufferType> &out) {
+    static void serialize( Node &node, rapidjson::Writer<BufferType> &out) {
       out.StartObject();
       out.String(NAME_TAG);
       out.String(node.getName());
@@ -19,8 +20,8 @@ class NodeSerializer {
       if(node.getType()!=Node::Type::LEAF){
         out.String(CHILDREN_TAG);
         out.StartArray();
-        for(const Node &n : node.getChildren()) {
-          NodeSerializer::serialize(n, out);
+        for(const std::weak_ptr<Node> &n : node.getChildren()) {
+          NodeSerializer::serialize(*n.lock(), out);
         }
         out.EndArray();
       }//if !isLeaf
@@ -28,7 +29,7 @@ class NodeSerializer {
       out.EndObject();
     }//serialize
 
-    static Node unserialize(const rapidjson::Value &jsonNode);
+    static std::shared_ptr<Node> unserialize(const rapidjson::Value &jsonNode);
 
   private:
 

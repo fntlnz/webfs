@@ -3,29 +3,31 @@
 
 using namespace webfs;
 
-Node& Filesystem::createElementDirectory(const std::string &path) {
-  Node *parent = rootNode->findParent(path);
-  assert(parent!=nullptr);
-  return parent->createChild(utils::explode(path, '/').back(), Node::Type::BRANCH);
+std::weak_ptr<Node> Filesystem::createElementDirectory(const std::string &path) {
+  auto parent = Node::findParent(rootNode,path);
+  assert(parent.lock()!=nullptr);
+  return parent.lock()->createChild(utils::explode(path, '/').back(), Node::Type::BRANCH);
 }
 
 
-Node& Filesystem::createElementFile(const std::string &path) {
-  Node *parent = rootNode->findParent(path);
-  assert(parent!=nullptr);
-  return parent->createChild(utils::explode(path, '/').back(), Node::Type::LEAF);
+std::weak_ptr<Node> Filesystem::createElementFile(const std::string &path) {
+  //TODO merge with createElementDirectory??
+  auto parent = Node::findParent(rootNode,path);
+  assert(parent.lock()!=nullptr);
+  return parent.lock()->createChild(utils::explode(path, '/').back(), Node::Type::LEAF);
 }
 
 int Filesystem::writeChunk(const std::string &path, const char *buf, size_t size, off_t offset) {
-  auto node = rootNode->findParent(path);
-  if (node->file == nullptr) {
-    node->file = new File();
+  auto node = Node::findParent(rootNode,path);
+  auto nodePtr = node.lock();
+  if (nodePtr->file == nullptr) {
+    nodePtr->file = new File();
   }
 
   // If offset == 0 and node is not empty means that the file is being
   // overwritten, create a new one in such case
-  if (offset == 0 && !node->file->empty()) {
-    node->file = new File();
+  if (offset == 0 && !nodePtr->file->empty()) {
+    nodePtr->file = new File();
   }
 
 
@@ -41,11 +43,11 @@ int Filesystem::writeChunk(const std::string &path, const char *buf, size_t size
   fileChunk->size = size;
   fileChunk->offset = offset;
   fileChunk->identifier = storage->write(buffer);
-  node->file->addChunk(fileChunk);
+  nodePtr->file->addChunk(fileChunk);
 
   return size;
 }
 
-Node *Filesystem::findNode(const std::string &path) {
-  return rootNode->findChild(path);
+std::weak_ptr<Node> Filesystem::findNode(const std::string &path) {
+  return Node::findChild(rootNode,path);
 }

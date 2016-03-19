@@ -4,26 +4,26 @@
 TEST(FilesystemTest, TestCreateDirectory) {
   using namespace webfs;
 
-  Node root("", Node::Type::BRANCH);
+  auto root = std::make_shared<Node>("/", Node::Type::BRANCH);
 
-  Filesystem fs(&root);
+  Filesystem fs(root);
 
-  Node &createdDirectory = fs.createElementDirectory("/mycreateddir");
+  auto createdDirectory = fs.createElementDirectory("/mycreateddir");
 
-  Node *foundCreatedDirectory = root.findChild("mycreateddir");
+  auto foundCreatedDirectory = Node::findChild(root,"mycreateddir");
 
-  EXPECT_EQ(*foundCreatedDirectory, createdDirectory);
+  EXPECT_EQ(*foundCreatedDirectory.lock(), *createdDirectory.lock());
 }
 
 TEST(FilesystemTest, TestCreateFile) {
   using namespace webfs;
-  Node root("", Node::Type::BRANCH);
+  auto root = std::make_shared<Node>("/", Node::Type::BRANCH);
 
-  Filesystem fs(&root);
+  Filesystem fs(root);
 
-  Node& createdFile = fs.createElementFile("/dummyfile.txt");
+  auto createdFile = fs.createElementFile("/dummyfile.txt");
 
-  Node* foundCreatedFile = root.findChild("dummyfile.txt");
+  auto foundCreatedFile = Node::findChild(root,"dummyfile.txt");
 
-  EXPECT_EQ(*foundCreatedFile, createdFile);
+  EXPECT_EQ(*foundCreatedFile.lock(), *createdFile.lock());
 }

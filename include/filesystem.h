@@ -9,16 +9,16 @@
 namespace webfs {
 class Filesystem {
   public:
-    Filesystem(Node *root): rootNode(root){}
+    Filesystem(std::shared_ptr<Node> &root): rootNode(root){}
 
-    Node& createElementDirectory(const std::string &path);
-    Node& createElementFile(const std::string &path);
-    Node *findNode(const std::string &path);
+    std::weak_ptr<Node> createElementDirectory(const std::string &path);
+    std::weak_ptr<Node> createElementFile(const std::string &path);
+    std::weak_ptr<Node> findNode(const std::string &path);
     int writeChunk(const std::string &path, const char *buf, size_t size, off_t offset);
 
     storage::Storage *storage; //TODO(fntlnz): should be private
   private:
-    Node *rootNode;
+    std::shared_ptr<Node> rootNode;
 };
 }
 #endif // WEBFS_FILESYSTEM_H_
