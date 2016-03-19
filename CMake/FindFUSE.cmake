@@ -11,7 +11,7 @@ ENDIF (FUSE_INCLUDE_DIR)
 
 # find includes
 FIND_PATH (FUSE_INCLUDE_DIR fuse.h
-        /usr/local/include/osxfuse
+        /usr/local/include/osxfuse/fuse
         /usr/local/include
         /usr/include
         )
