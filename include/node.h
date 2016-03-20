@@ -56,9 +56,9 @@ class Node {
      */
 
     static std::weak_ptr<Node> findChild(const std::weak_ptr<Node> &node,
-    		const std::string &relativePath);
+        const std::string &relativePath);
     static std::weak_ptr<Node> findParent(const std::weak_ptr<Node> &node,
-    		const std::string &relativePath);
+        const std::string &relativePath);
 
     const std::string& getName()const{
       return name;
@@ -70,13 +70,13 @@ class Node {
 
     //TODO: ADD CONST?
     std::vector<std::weak_ptr<Node>> getChildren(){
-    	std::vector<std::weak_ptr<Node>> temp(children.size());
+      std::vector<std::weak_ptr<Node>> temp(children.size());
 
-    	std::transform(std::begin(children),std::end(children),std::begin(temp),[](std::shared_ptr<Node> &temp){
-    		return std::weak_ptr<Node>(temp);
-    	});
+      std::transform(std::begin(children),std::end(children),std::begin(temp),[](std::shared_ptr<Node> &temp){
+        return std::weak_ptr<Node>(temp);
+      });
 
-    	return temp;
+      return temp;
     }
 
     /**
@@ -114,7 +114,7 @@ class Node {
   private:
 
     static std::weak_ptr<Node> findInChildren(const std::weak_ptr<Node> &node,
-    		const std::string &currentName);
+        const std::string &currentName);
     std::string name;
     Node *const parent;
 
